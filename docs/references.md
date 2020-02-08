@@ -12,6 +12,9 @@
 #### OAuth2-Flask App Example from DungeonDev
 [https://github.com/DevDungeon/OAuth2-Login-Python-Flask-Example/blob/master/discord_oauth_login_server.py]()
 
+#### OAuth-Flask App Example for Google APIs
+[https://bitwiser.in/2015/09/09/add-google-login-in-flask.html]()
+
 #### Design Doc Lecture
 [https://ilearn.marist.edu/access/content/group/cf986169-d17f-4d5b-a3a6-53f18577a51f/Lecture%20Slides/Week%206%20-%20Design%20Documents.pdf]()
 
