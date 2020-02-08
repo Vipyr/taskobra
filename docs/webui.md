@@ -54,15 +54,6 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 - The JSON is rendered by BokehJS function calls into charts, which are then placed into the Canvas tags on the page
 - Scaling is native, so leveraging the div structure on the page with CSS, we can create small charts to fix in Thumbnails
 
-## Libraries and Depdenencies
-
-#### BokehJS
-[https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html]
-    
-  
-#### Bootstrap4
-[https://getbootstrap.com/docs/4.4/getting-started/introduction/]
-
 ## Accessibility and Globalization
 
 #### Globalization Concerns
@@ -82,4 +73,12 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 	- This can especially occur when overlayingd data from multiple sources (such as multiple hosts)
 	- To address this, BokehJS has an extensive color pallette selection, including a 'colorblind' pallette ([https://docs.bokeh.org/en/latest/docs/reference/palettes.html])
 
+## Libraries and Depdenencies
+
+#### BokehJS
+[https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html]
+    
+  
+#### Bootstrap4
+[https://getbootstrap.com/docs/4.4/getting-started/introduction/]
 
