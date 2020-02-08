@@ -22,17 +22,20 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 - Selectable Metrics
 	- Each metric can be displayed seperately
   - All data metrics will be updated via Asynchonous JavaScript Actions (AJAX) 
-  
+    
+    
 - Overlay of Multi-Host Data
 	- Main graph will optionally contain data for more than one host
 	- Data will likely be normalized to Host's resources along the Y axis to make the comparisons meaningful 
-
+    
+  
 - Host Table 
 	- Lists all hosts where the Daemon is runnig and collecting data
 	- Status: Current state of the machine/daemon (online, offline, other)
   - Uptime: Duration the Daemon has been alive and running
 		- If the Daemon is tied to a Startup Process, this will corespond to the uptime of the machine
 	- Graphic: Will represent some composite metric of 'utilization' normalized as a percentage, represented by a bar
+    
 
 ## Implementation Details
 
@@ -42,7 +45,8 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 	- Will use Bootstrap, a popular CSS/JS/HTML5 Library that provides native structures
 	- Bootstrap also uses a grid system for defining layouts, which will make it easy to define the structure of the page
 	- The native scaling of Bootstrap will also help achieve the design goals of portability, making it easy to define different aspect ratios 
-
+    
+  
 - Charts Implementation
 	- Charts will be defined using BokehJS, a library with a Python counterpart
 	- BokehJS provides a number of charts that can be rendered via HTML5 Canvases
@@ -54,7 +58,8 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 
 - BokehJS
 	- https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html
-
+    
+  
 - Bootstrap
 	- https://getbootstrap.com/docs/4.4/getting-started/introduction/
 
@@ -65,7 +70,8 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 	- Instead we will use Iconography that makes it easy to differentiate the metrics 
 	- With good Iconography, users will still be able to interpret the data meaningfully
 	- We will also leverage modern browser translation support by exposing the text direction to the browser
-
+    
+  
 - Accessibility Concerns
 	- Accessibility when providing charts is a key concern
 	- Selecting Elements on the Page
