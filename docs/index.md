@@ -8,12 +8,12 @@ Whether you're a sys-admin or an enthusiast with a seperate gaming and movie hos
 
 ## Contents 
 
-[Overview](overview.md)
-[Web-based UI](webui.md) 
-[Metrics](metrics.md)
-[Authentication](auth.md)
-[Deployment Model](deployment.md)
-[Contributing](contributing.md)
-[References](references.md)
-
+[Overview](overview.md)    
+[Web-based UI](webui.md)     
+[Metrics](metrics.md)    
+[Authentication](auth.md)    
+[Deployment Model](deployment.md)    
+[Contributing](contributing.md)    
+[References](references.md)    
+    
 
