@@ -3,6 +3,8 @@
 
 ## Mockup of the UI
 
+![UI Mockup](images/uimockup.png)
+
 ## Metrics
 
 - CPU Utilization
