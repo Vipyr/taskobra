@@ -57,11 +57,11 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
 ## Libraries and Depdenencies
 
 #### BokehJS
-https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html
+[https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html]
     
   
 #### Bootstrap4
-https://getbootstrap.com/docs/4.4/getting-started/introduction/
+[https://getbootstrap.com/docs/4.4/getting-started/introduction/]
 
 ## Accessibility and Globalization
 
@@ -80,7 +80,6 @@ https://getbootstrap.com/docs/4.4/getting-started/introduction/
 - Viewing Data on the Charts
 	- When displaying the data, bad color selection can lead to difficulty for users to view the data
 	- This can especially occur when overlayingd data from multiple sources (such as multiple hosts)
-	- To address this, BokehJS has an extensive color pallette selection, including a 'colorblind' pallette
-		- https://docs.bokeh.org/en/latest/docs/reference/palettes.html
+	- To address this, BokehJS has an extensive color pallette selection, including a 'colorblind' pallette ([https://docs.bokeh.org/en/latest/docs/reference/palettes.html])
 
 
