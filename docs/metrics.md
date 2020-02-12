@@ -43,9 +43,9 @@ Owner         | :heavy_check_mark: |                :x: |Owners are System Obser
 ### Systems
 
 Individual Systems, or Hosts, in taskobra are represented by multiple tables.
-The root is the System table which contains an ID, the owner's ID, and a system
+The root is the `System` table which contains an ID, the owner's ID, and a system
 name.  Other information about the System is determined compositionally by querying
-through the associative SystemComponent table.  The SystemComponent table represents
+through the associative `SystemComponent` table.  The `SystemComponent` table represents
 a many to many relationship between System IDs and Component IDs.
 
 ---
@@ -54,16 +54,16 @@ a many to many relationship between System IDs and Component IDs.
 
 There is a table for each type of component that taskobra takes measurements of.
 
-| Component |               CPU |          GPU |       Memory |      Network Adapter |      Storage
-|-----------|-------------------|--------------|--------------|----------------------|--------------
-|           |      Manufacturer | Manufacturer | Manufacturer |         Manufacturer | Manufacturer
-|           |             Model |        Model |     Capacity |                 Type |     Capacity
-|           |               ISA | Architecture |      Timings |          MAC Address | Maximum Write Rate
-|           |               TDP |          TDP |    Frequency |    Maximum Send Rate | Maximum Read Rate
-|           |             Cores |        Cores |              | Maximum Receive Rate |
-|           |      Threads/Core |       Memory |              |                      |
-|           | Maximum Frequency |              |              |                      |
-|           | Minimum Frequency |              |              |                      |
+|               CPU |          GPU |       Memory |      Network Adapter |            Storage |
+|-------------------|--------------|--------------|----------------------|--------------------|
+|      Manufacturer | Manufacturer | Manufacturer |         Manufacturer |       Manufacturer |
+|             Model |        Model |     Capacity |                 Type |           Capacity |
+|               ISA | Architecture |      Timings |          MAC Address | Maximum Write Rate |
+|               TDP |          TDP |    Frequency |    Maximum Send Rate | Maximum Read Rate  |
+|             Cores |        Cores |              | Maximum Receive Rate |                    |
+|      Threads/Core |       Memory |              |                      |                    |
+| Maximum Frequency |              |              |                      |                    |
+| Minimum Frequency |              |              |                      |                    |
 
 
 ---
