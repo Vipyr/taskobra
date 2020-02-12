@@ -10,7 +10,7 @@ Whether you're a sys-admin or an enthusiast with a seperate gaming and movie hos
 ## Problem Statement 
 Without enterprise grade infrastructure it can be difficult to monitor more than one host, but in an age where even our pockets have computers, everyone owns multiple systems. The mainstream task managers are focused on providing you information about the host that you're currently _on_ not the hosts you have all over your house. Many users have a laptop, an at home desktop, and some even have a few servers in the cloud to keep an eye on! 
 
-Taskobra is designed to provide insights and metrics for users in the modern era of computing, no matter where your computers are, all in one place.  
+Taskobra is designed to provide insights and metrics for users in the modern era of computing, no matter where your computers are.
 
 ## Architecture 
 
