@@ -46,13 +46,18 @@ Individual Systems, or Hosts, in taskobra are represented by multiple tables.
 The root is the `System` table which contains an ID, the owner's ID, and a system
 name.  Other information about the System is determined compositionally by querying
 through the associative `SystemComponent` table.  The `SystemComponent` table represents
-a many to many relationship between System IDs and Component IDs.
+a many to many relationship between System IDs and Abstract Component IDs.
 
 ---
 
 ### Components
 
-There is a table for each type of component that taskobra takes measurements of.
+The gatekeeper to Component identification is the `ComponentType` table, which contains
+a mapping of Abstract Component ID to Concrete Component ID and Type.  The Abstract
+Component ID is a generic ID of the component without any knowledge of the type.  The
+Concrete Component ID is the ID of a Component of known type.  There is a table for
+each type of component that taskobra takes measurements of.  These are indexed by
+Concrete Component ID.
 
 |               CPU |          GPU |       Memory |      Network Adapter |            Storage |
 |-------------------|--------------|--------------|----------------------|--------------------|
@@ -64,6 +69,50 @@ There is a table for each type of component that taskobra takes measurements of.
 |      Threads/Core |       Memory |              |                      |                    |
 | Maximum Frequency |              |              |                      |                    |
 | Minimum Frequency |              |              |                      |                    |
+
+For each component type, there are defined metrics with specific formats.  These metrics are
+each associated with a snapshot ID and Concrete Component ID.
+
+#### CPU Metrics
+
+| CPU Utilization | CPU Frequency | CPU Temperature |
+|-----------------|---------------|-----------------|
+|     Snapshot ID |   Snapshot ID |     Snapshot ID |
+|          CPU ID |        CPU ID |          CPU ID |
+|            Core |          Core |                 |
+|           Value |         Value |           Value |
+
+#### GPU Metrics
+
+| GPU Utilization | GPU Temperature |
+|-----------------|-----------------|
+|     Snapshot ID |     Snapshot ID |
+|          GPU ID |          GPU ID |
+|           Value |           Value |
+
+#### Memory Metrics
+
+| Memory Used | Memory Commit | Memory Paged |
+|-------------|---------------|--------------|
+| Snapshot ID |   Snapshot ID |  Snapshot ID |
+|   Memory ID |     Memory ID |    Memory ID |
+|       Value |         Value |        Value |
+
+#### Network Adapter Metrics
+
+|          Send Rate |       Receive Rate |
+|--------------------|--------------------|
+|        Snapshot ID |        Snapshot ID |
+| Network Adapter ID | Network Adapter ID |
+|              Value |              Value |
+
+#### Storage Metrics
+
+|   Read Rate |  Write Rate |
+|-------------|-------------|
+| Snapshot ID | Snapshot ID |
+|  Storage ID |  Storage ID |
+|       Value |       Value |
 
 
 ---
