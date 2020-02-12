@@ -73,6 +73,27 @@ Concrete Component ID.
 For each component type, there are defined metrics with specific formats.  These metrics are
 each associated with a snapshot ID and Concrete Component ID.
 
+---
+
+### Snapshots
+
+Snapshots are a collection of metrics representing the host System's
+state at a specific time.  Each Snapshot contains a System ID and
+timestamp, and is associated with a set of records in the Metrics
+tables for each Component type.
+
+---
+
+### Metrics
+
+Metrics are simple data points which contain a Snapshot ID,
+Component ID, and some number of values, depending on their
+specific format.  Metrics are the building blocks of all the
+views available in the [Web Front-End](webui.md).  For example,
+the total system CPU utilization can be computed by taking the
+mean of the all `CpuUtilization` metrics for a given Snapshot
+across each Core and Thread in a system.
+
 #### CPU Metrics
 
 | CPU Utilization | CPU Frequency | CPU Temperature |
@@ -80,6 +101,7 @@ each associated with a snapshot ID and Concrete Component ID.
 |     Snapshot ID |   Snapshot ID |     Snapshot ID |
 |          CPU ID |        CPU ID |          CPU ID |
 |            Core |          Core |                 |
+|          Thread |               |                 |
 |           Value |         Value |           Value |
 
 #### GPU Metrics
@@ -114,21 +136,6 @@ each associated with a snapshot ID and Concrete Component ID.
 |  Storage ID |  Storage ID |
 |       Value |       Value |
 
-
----
-
-### Snapshots
-
----
-
-### Metrics
-
-The foundation of the data model is the snapshot.  Each snapshot
-is a collection of metrics, measured at the same time.  Metrics
-are simple data points which contain a type, value, and are
-associated with component.  The type and component can be used
-to determine how the value is interpreted.
-
 ---
 
 ## Pruning?
@@ -136,4 +143,3 @@ to determine how the value is interpreted.
 ---
 
 ## Metrics Monitoring Lib (PSUTIL)
-
