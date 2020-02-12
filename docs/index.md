@@ -31,11 +31,11 @@ Taskobra is made up of three main components:
 
 
 ## Contents 
-[Web-based UI](webui.md)     
-[Metrics](metrics.md)    
-[Authentication](auth.md)    
-[Deployment Model](deployment.md)    
-[Contributing](contributing.md)    
-[References](references.md)    
+- [Web-based UI](webui.md)     
+- [Metrics](metrics.md)    
+- [Authentication](auth.md)    
+- [Deployment Model](deployment.md)    
+- [Contributing](contributing.md)    
+- [References](references.md)    
     
 
