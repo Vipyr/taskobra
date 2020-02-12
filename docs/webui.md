@@ -30,7 +30,7 @@ The top half of the UI is inspired by the Microsoft Task Manager. This UI is hig
     
   
 #### Host Table 
-- Lists all hosts where the Daemon is runnig and collecting data
+- Lists all hosts where the Daemon is running and collecting data
 - Status: Current state of the machine/daemon (online, offline, other)
 - Uptime: Duration the Daemon has been alive and running
 	- If the Daemon is tied to a Startup Process, this will corespond to the uptime of the machine
