@@ -1,5 +1,5 @@
 # Web-based UI
-[Home](../)
+[Home](./index.md)
 
 ![UI Mockup](images/uimockup.png)
 

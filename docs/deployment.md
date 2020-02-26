@@ -1,5 +1,5 @@
 # Deployment Model
-[Home](../)
+[Home](./index.md)
 
 ## Deploying the Database and Webserver
 

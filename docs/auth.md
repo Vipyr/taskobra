@@ -1,5 +1,5 @@
 # Authentication
-[Home](../)
+[Home](./index.md)
 
 ![Grant Type Authentication Flow](images/auth_code_flow.png)
 
