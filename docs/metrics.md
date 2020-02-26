@@ -31,12 +31,11 @@ Roles, which apply to the entire data model.  The second is System Roles, which
 apply to the data for a particular System.  There are four Roles different:
 Administrator, Observer, Reporter, and Owner.
 
-Role          |             System |               Site | Description
+Role          |        System/Host |           Taskobra | Description
 --------------|--------------------|--------------------|-------------
-Administrator |                :x: | :heavy_check_mark: | Administrators can affect any data in the data model, which means they can add/remove Users, Systems, Components, and read or write Snapshot data.
-Observer      | :heavy_check_mark: | :heavy_check_mark: | Site Observers can read data from any tables.  System Observers can read data from the System, Component, and Snapshot tables.
+Administrator | :heavy_check_mark: | :heavy_check_mark: | System/Host Administrators are System Observers and Reporters, and can also insert and update data in the System and Component tables for systems they own.<br/>Taskobra Administrators can affect any data in the data model, which means they can add/remove Users, Systems, Components, and read or write Snapshot data.
+Observer      | :heavy_check_mark: | :heavy_check_mark: | Taskobra Observers can read data from any tables.<br/>System/Host Observers can read data from the System, Component, and Snapshot tables.
 Reporter      | :heavy_check_mark: |                :x: | Reporters can insert data into the System, Component, and Snapshot tables.
-Owner         | :heavy_check_mark: |                :x: |Owners are System Observers and Reporters, and can also insert and update data in the System and Component tables for systems they own.
 
 ---
 
@@ -70,8 +69,8 @@ Concrete Component ID.
 | Maximum Frequency |              |              |                      |                    |
 | Minimum Frequency |              |              |                      |                    |
 
-For each component type, there are defined metrics with specific formats.  These metrics are
-each associated with a snapshot ID and Concrete Component ID.
+For each component type, there are defined metrics with specific formats.
+These metrics are each associated with a snapshot ID and Concrete Component ID.
 
 ---
 
@@ -80,7 +79,10 @@ each associated with a snapshot ID and Concrete Component ID.
 Snapshots are a collection of metrics representing the host System's
 state at a specific time.  Each Snapshot contains a System ID and
 timestamp, and is associated with a set of records in the Metrics
-tables for each Component type.
+tables for each Component type.  Because we periodically prune the
+backend database, snapshots need to be aware of the period of time
+they cover, which is represented as a base and an exponent.  These
+are used during pruning to figure out how many data points to prune.
 
 ---
 
@@ -138,7 +140,36 @@ across each Core and Thread in a system.
 
 ---
 
-## Pruning?
+## Pruning
+
+When analyzing performance or debugging problems, down to the second data is
+important to have.  On the other hand, looking at system and pool performance
+trends requires data to persist for long periods of time, but doesn't need
+frequent samples.  Rather than store a linear set of samples, taskobra can
+be configured to automatically compress aging data.
+
+We use a logarithmic scale to calculate averages, combining multiple snapshots
+into one.  This time period can be represented by a base and an exponent.  Raw
+snapshot data generally is reported with an exponent of 0 and a Reporter
+configurable base. For example, the following snapshots are 1 second apart,
+with base 3 pruning.
+
+| Snapshot |  User | System | Time | Base | Exponent |
+|----------|-------|--------|------|------|----------|
+|        0 |    42 |    314 | 1000 |    3 |        0 |
+|        1 |    42 |    314 | 1001 |    3 |        0 |
+|        2 |    42 |    314 | 1002 |    3 |        0 |
+
+After applying the pruning algorithm, the snapshot table would look
+something like this:
+
+| Snapshot |  User | System | Time | Base | Exponent |
+|----------|-------|--------|------|------|----------|
+|        3 |    42 |    314 | 1001 |    3 |        1 |
+
+Pruned snapshots cover <code>Base<sup>Exponent</sup></code> seconds,
+with a Timestamp in the center of that range, and contain an average
+of all the snapshots they were generated from.
 
 ---
 
