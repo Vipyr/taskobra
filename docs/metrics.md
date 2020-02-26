@@ -173,4 +173,28 @@ of all the snapshots they were generated from.
 
 ---
 
-## Metrics Monitoring Lib (PSUTIL)
+## Metrics Monitoring
+
+### Using [psutil](https://psutil.readthedocs.io/en/latest/)
+
+Python's `psutil` is a mature, well supported, cross-platform library that
+provides system information and statistics.  Statistic availability is
+not the same across all platforms, for instance temperatures are only
+available in Linux and FreeBSD, and fan speeds only in Linux and MacOS.
+Our ORM is resilient to missing data, since snapshots are composed of
+entries from many snapshot type tables.  A missing entry simply means
+the query returns no items, and presentation of that fact can be made
+clear to users on the front end with a message like "No Data."
+
+In the future, extensions can be implemented to cover statistics across
+more platforms by having fallback routines, or contributing back to
+`psutil`.
+
+### Using [Open Hardware Monitor](https://openhardwaremonitor.org/)
+
+Using the [`pythonnet`](https://pythonnet.github.io/) module and the
+API provided by Open Hardware Monitor statistics such as temperatures
+and fan speeds can be retreived.  It supports Windows 7/8/10 and all
+x86 Linux installations.  Support for these statistics represents
+additional development effort and user setup time due to external
+dependencies.
