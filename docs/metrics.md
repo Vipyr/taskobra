@@ -192,7 +192,7 @@ more platforms by having fallback routines, or contributing back to
 
 ### Using [Open Hardware Monitor](https://openhardwaremonitor.org/)
 
-Using the [`pythonnet`](https://pythonnet.github.io/) module and the
+Using the [pythonnet](https://pythonnet.github.io/) module and the
 API provided by Open Hardware Monitor statistics such as temperatures
 and fan speeds can be retreived.  It supports Windows 7/8/10 and all
 x86 Linux installations.  Support for these statistics represents
