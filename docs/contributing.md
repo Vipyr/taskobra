@@ -1,5 +1,5 @@
 # Contributing
-[Home](../index.md)
+[Home](../)
 
 ## How do I file a bug report
 

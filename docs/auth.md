@@ -1,5 +1,5 @@
 # Authentication
-[Home](../index.md)
+[Home](../)
 
 ![Grant Type Authentication Flow](images/auth_code_flow.png)
 
@@ -51,6 +51,3 @@ When designing a system that will operate in the modern world, we need to be abl
 
 #### OAuth Requests Lib
 [https://requests-oauthlib.readthedocs.io/en/latest/]()
-
-
-

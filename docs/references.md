@@ -1,5 +1,5 @@
 # References
-[Home](../index.md)
+[Home](../)
 
 #### BokehJS
 [https://docs.bokeh.org/en/latest/docs/dev_guide/bokehjs.html]()

@@ -1,5 +1,5 @@
 # Metrics
-[Home](../index.md)
+[Home](../)
 
 ## Data Model
 
