@@ -17,7 +17,7 @@ list to find even more.
 
 ## Making a Contribution
 
-When you're ready to start code, head to the [home page](https://github.com/Vipyr/taskobra)
+When you're ready to start coding, head to the [home page](https://github.com/Vipyr/taskobra)
 and click the "Fork" button in the top right.  Once you have a fork, clone
 it and start writing a solution!  When you have something to get feedback on
 or that is a candidate for inclusion in the main repository, open a [Pull Request](https://github.com/Vipyr/taskobra/compare) and fill in the pull request template.
