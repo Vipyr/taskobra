@@ -9,7 +9,7 @@ from taskobra.orm.associations import user_role_table
 class User(ORMBase):
     __tablename__ = "User"
     unique_id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, unique=True)
     roles = relationship("Role", secondary=user_role_table)
     system_roles = relationship("UserSystemRole")
 
