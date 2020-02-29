@@ -11,11 +11,11 @@ class TestCPU(ORMTestCase):
                 manufacturer="AMD",
                 model="Ryzen 3800X",
                 isa="x86-64",
-                tdp=65,
-                core_count=12,
+                tdp=105,
+                core_count=8,
                 threads_per_core=2,
-                minimum_frequency=3.0,
-                maximum_frequency=4.2,
+                minimum_frequency=3.9,
+                maximum_frequency=4.5,
             )
             gpu = GPU(
                 manufacturer="NVIDIA",
