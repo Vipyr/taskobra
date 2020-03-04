@@ -14,7 +14,7 @@ class TestCPU(ORMTestCase):
                 tdp=65,
                 core_count=12,
                 threads_per_core=2,
-                minimum_frequency=3.0,
+                nominal_frequency=3.0,
                 maximum_frequency=4.2,
             )
             session.add(cpu)
@@ -27,5 +27,5 @@ class TestCPU(ORMTestCase):
             self.assertEqual(cpu.tdp, 65)
             self.assertEqual(cpu.core_count, 12)
             self.assertEqual(cpu.threads_per_core, 2)
-            self.assertEqual(cpu.minimum_frequency, 3.0)
+            self.assertEqual(cpu.nominal_frequency, 3.0)
             self.assertEqual(cpu.maximum_frequency, 4.2)

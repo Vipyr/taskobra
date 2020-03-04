@@ -4,8 +4,8 @@ from taskobra.orm import User, Role, System
 from taskobra.orm import UserSystemRole
 
 
-class TestUserSystemRole(ORMTestCase):
-    def test_query_UserSystemRole(self):
+class TestUserRole(ORMTestCase):
+    def test_query_UserRole(self):
         # Put some data into the db
         with get_session(bind=get_engine("sqlite:///:memory:")) as session:
             user = User(name="Fred")

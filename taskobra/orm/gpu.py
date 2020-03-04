@@ -19,4 +19,4 @@ class GPU(Component):
     }
 
     def __repr__(self):
-        return f"<GPU({self.manufacturer} {self.model} ({self.architecture}))>"
+        return f"<GPU({self.manufacturer} {self.model} ({self.core_count}x{self.architecture}, {self.memory} GB))>"

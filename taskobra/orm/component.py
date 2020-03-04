@@ -11,7 +11,14 @@ class Component(ORMBase):
     unique_id = Column(Integer, primary_key=True)
     system_components = relationship("SystemComponent")
     systems = association_proxy("system_components", "system")
-    component_type = Column(Enum("CPU", "GPU", "Memory", "NetworkAdapter", "Storage"))
+    component_type = Column(Enum(
+        "CPU",
+        "GPU",
+        "Memory",
+        "OperatingSystem",
+        "NetworkAdapter",
+        "Storage"
+    ))
 
 
     __mapper_args__ = {

@@ -1,9 +1,9 @@
 # Libraries
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 # Taskobra
 from taskobra.orm.base import ORMBase
-from taskobra.orm.associations import user_role_table
+from taskobra.orm.relationships.user_role import user_role_table
 
 
 class User(ORMBase):

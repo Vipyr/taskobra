@@ -9,10 +9,10 @@ class TestUserSystemRole(ORMTestCase):
         # Put some data into the db
         with get_session(bind=get_engine("sqlite:///:memory:")) as session:
             user = User(name="Fred")
+            system = System(name="Fred's Computer")
             administrator = Role(name="Administrator")
             reporter = Role(name="Reporter")
             observer = Role(name="Observer")
-            system = System(name="Fred's Computer")
             UserSystemRole(user=user, system=system, role=administrator)
             UserSystemRole(user=user, system=system, role=reporter)
             UserSystemRole(user=user, system=system, role=observer)
@@ -21,38 +21,58 @@ class TestUserSystemRole(ORMTestCase):
         with get_session(bind=get_engine("sqlite:///:memory:")) as session:
             users = session.query(User)
             systems = session.query(System)
-            # self.assertEqual(len(users[0].system_roles), 3)
+            self.assertEqual(len(users[0].system_roles), 3)
+            self.assertEqual(len(systems[0].user_roles), 3)
             for role in users[0].system_roles:
                 self.assertIn(role, systems[0].user_roles)
                 self.assertIs(role.user, users[0])
             for role in systems[0].user_roles:
                 self.assertIn(role, users[0].system_roles)
                 self.assertIs(role.system, systems[0])
+            self.assertIn(systems[0], [role.system for role in users[0].system_roles])
+            self.assertIn(users[0], [role.user for role in systems[0].user_roles])
 
-    # def test_table(self):
-    #     with get_session(bind=get_engine("sqlite:///:memory:")) as session:
-    #         user = User(name="Fred")
-    #         role = Role(name="Administrator")
-    #         system = System(name="Fred's Computer")
-    #         user.roles.append(role)
-    #         UserSystemRole(user=user, system=system, role=role)
-    #         session.add(user)
+    def test_UserSystemRole_user_property(self):
+        user_system_role = UserSystemRole()
+        user = User(name="Fred")
+        user_system_role.user = user
+        self.assertIn(user_system_role, user.system_roles)
 
-    #         print(user)
-    #         print(system)
-    #         print(role)
+    def test_UserSystemRole_system_property(self):
+        user_system_role = UserSystemRole()
+        system = System(name="Fred's Computer")
+        user_system_role.system = system
+        self.assertIn(user_system_role, system.user_roles)
 
-    #         user_q = session.query(User)[-1]
-
-    #         print(user is user_q)
-
-    #         self.assertTrue(user is session.query(User)[-1])
-    #         self.assertEqual(user.name, session.query(User)[-1].name)
-    #         user_q.name = "Frank"
-    #         self.assertEqual(user.name, session.query(User)[-1].name)
-    #         print(user_q)
-
-    #         print()
-    #         print(user)
-    #         print(system)
-    #         print(role)
+    def test_UserSystemRole_creation(self):
+        with self.subTest("No Arguments"):
+            user_system_role = UserSystemRole()
+            self.assertIsNone(user_system_role.user)
+            self.assertIsNone(user_system_role.system)
+            self.assertIsNone(user_system_role.role)
+        with self.subTest("User Only"):
+            user = User(name="Fred")
+            user_system_role = UserSystemRole(user=user)
+            self.assertIs(user_system_role.user, user)
+            self.assertIsNone(user_system_role.system)
+            self.assertIsNone(user_system_role.role)
+        with self.subTest("System Only"):
+            system = System(name="Fred's Computer")
+            user_system_role = UserSystemRole(system=system)
+            self.assertIsNone(user_system_role.user)
+            self.assertIs(user_system_role.system, system)
+            self.assertIsNone(user_system_role.role)
+        with self.subTest("Role Only"):
+            role = Role(name="Fred's Role")
+            user_system_role = UserSystemRole(role=role)
+            self.assertIsNone(user_system_role.user)
+            self.assertIsNone(user_system_role.system)
+            self.assertIs(user_system_role.role, role)
+        with self.subTest("All"):
+            user = User(name="Fred")
+            system = System(name="Fred's Computer")
+            role = Role(name="Fred's Role")
+            user_system_role = UserSystemRole(user=user, system=system, role=role)
+            self.assertIs(user_system_role.user, user)
+            self.assertIs(user_system_role.system, system)
+            self.assertIs(user_system_role.role, role)
