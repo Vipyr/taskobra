@@ -1,4 +1,4 @@
-from .ORMTestCase import ORMTestCase
+from ..ORMTestCase import ORMTestCase
 from taskobra.orm import get_engine, get_session, ORMBase
 from taskobra.orm import User, Role, System
 from taskobra.orm import UserSystemRole

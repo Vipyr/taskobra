@@ -1,4 +1,4 @@
-from .ORMTestCase import ORMTestCase
+from ..ORMTestCase import ORMTestCase
 from taskobra.orm import get_engine, get_session, Component, System, SystemComponent
 
 
