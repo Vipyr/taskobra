@@ -3,6 +3,7 @@ from .component import Component
 from .cpu import CPU
 from .gpu import GPU
 from .memory import Memory
+from .metric import Metric
 from .operating_system import OperatingSystem
 from .role import Role
 from .user import User
