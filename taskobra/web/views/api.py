@@ -1,5 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, jsonify
 
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 
+@blueprint.route('/')
+def base():
+    """
+    Base API Route, not sure what this should return
+    Probably TODO remove, and replace with interesting routes 
+    """
+    return jsonify({})
+    
