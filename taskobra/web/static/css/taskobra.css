@@ -1,0 +1,15 @@
+.navbar {
+    background-color: #33cc33;
+}
+  
+#taskobra-navbar .navbar-brand {
+  font-size: 48px;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  color: #4d4d4d;
+}
+
+#taskobra-icon {
+    width: 64px;
+    height: 64px;
+}
+

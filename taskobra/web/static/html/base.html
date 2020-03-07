@@ -6,15 +6,22 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Bootstrap CSS via CDN --> 
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename="assets/favicon.ico") }}"/>
 	<link rel="stylesheet" href="{{ url_for('static', filename="css/lib/bootstrap-4.0.0.min.css") }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename="css/taskobra.css") }}">
   </head>
 
+  <body> 
+    <!-- Navbar/Banner -->
+    <nav class="navbar navbar-light" id="taskobra-navbar">
+      <a class="navbar-brand" href="{{ url_for('ui.index') }}"> 
+        <img src="{{ url_for('static', filename="assets/taskobra_icon.png") }}" id="taskobra-icon"> Taskobra 
+      </a>
+    </nav>
+      
+    {% block content %}{% endblock %}
+  </body>
 
-  {% block content %}{% endblock %}
-
-  <!-- Bootstrap JS via CDN --> 
   <script src="{{ url_for('static', filename="js/lib/jquery-3.2.1.slim.min.js") }}"></script>
   <script src="{{ url_for('static', filename="js/lib/popper-1.12.9.min.js") }}"></script>
   <script src="{{ url_for('static', filename="js/lib/bootstrap-4.0.0.min.js") }}"></script>
