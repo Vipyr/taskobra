@@ -1,0 +1,22 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %} - Taskobra </title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Bootstrap CSS via CDN --> 
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/lib/bootstrap-4.0.0.min.css") }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename="css/taskobra.css") }}">
+  </head>
+
+
+  <body> {% block content %}{% endblock %} </body>
+
+  <!-- Bootstrap JS via CDN --> 
+  <script src="{{ url_for('static', filename="js/lib/jquery-3.2.1.slim.min.js") }}"></script>
+  <script src="{{ url_for('static', filename="js/lib/popper-1.12.9.min.js") }}"></script>
+  <script src="{{ url_for('static', filename="js/lib/bootstrap-4.0.0.min.js") }}"></script>
+  <script src="{{ url_for('static', filename="js/taskobra.js")}}"></script>
+</html>
