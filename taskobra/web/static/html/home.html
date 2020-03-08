@@ -28,21 +28,32 @@
               2) Render a seperate canvas for each metric below and keep (might be easier/faster)
       -->
       <div class="tab-content" id="v-pills-tabContent">
+
+        <!-- Overall Chart -->
         <div class="tab-pane fade show active" id="v-pills-overall" role="tabpanel" aria-labelledby="v-pills-overall-tab">
-            Overall
+          <div class="taskobra-chart" id="taskobra-overall-chart"></div>
         </div>
+
+        <!-- CPU Chart -->
         <div class="tab-pane fade" id="v-pills-cpu" role="tabpanel" aria-labelledby="v-pills-cpu-tab">
-            cpu
+          <div class="taskobra-chart" id="taskobra-cpu-chart"></div>
         </div>
+
+        <!-- GPU Chart -->
         <div class="tab-pane fade" id="v-pills-gpu" role="tabpanel" aria-labelledby="v-pills-gpu-tab">
-            gpu
+          <div class="taskobra-chart" id="taskobra-gpu-chart"></div>
         </div>
+
+        <!-- Memory Chart -->
         <div class="tab-pane fade" id="v-pills-memory" role="tabpanel" aria-labelledby="v-pills-memory-tab">
-            memory
+          <div class="taskobra-chart" id="taskobra-memory-chart"></div>
         </div>
+
+        <!-- Storage Chart -->
         <div class="tab-pane fade" id="v-pills-storage" role="tabpanel" aria-labelledby="v-pills-storage-tab">
-            storage
+          <div class="taskobra-chart" id="taskobra-stoage-chart"></div>
         </div>
+
       </div>
     </div>
   </div>

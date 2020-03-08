@@ -26,6 +26,37 @@ function render_hostlist(hostlist) {
   });
 }
 
+/*
+    Dynamic Chart rendering function
+      Fills in the charts for each tabbed section 
+      https://developers.google.com/chart/interactive/docs/quick_start
+*/
+function render_charts() {
+  // TODO: Fill this in with real charts
+  var data = google.visualization.arrayToDataTable([
+    ['Year', 'Sales', 'Expenses'],
+    ['2004',  1000,      400],
+    ['2005',  1170,      460],
+    ['2006',  660,       1120],
+    ['2007',  1030,      540]
+  ]);
+  
+  document.querySelectorAll(".taskobra-chart").forEach(chart => {
+
+    var options = {
+      title: 'Company Performance',
+      curveType: 'function',
+      width: 1200, height: 500,         // TODO: This will need to be reflexive obviously 
+      legend: { position: 'bottom' }
+    };
+
+    console.log(chart);
+    var chart = new google.visualization.LineChart(chart);
+
+    chart.draw(data, options);
+
+  });
+}
 
 /* 
     Main Callback
@@ -41,4 +72,9 @@ window.onload = (event) => {
     { hostname: "Thr33", status: "ok", uptime: "0h 0m 1s", misc: "---->" }
   ]
   render_hostlist(hostlist);
+
+  // Charting setup
+  // Load the Visualization API and the corechart package.
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(render_charts);
 };
