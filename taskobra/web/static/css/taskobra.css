@@ -1,3 +1,14 @@
+
+/*
+    Full Page
+*/
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+
+
 /*
     Navbar/Top of the Page
 */
@@ -27,7 +38,6 @@
     border-width: 1px;
 }
 
-/* active (faded) */
 .nav-pills .nav-link.active {
     background-color: rgba(51, 204, 51, 0.4);
     color: rgb(77, 77, 77);
@@ -45,5 +55,9 @@
     Hostlist - bottom of the page
 */
 #taskobra-hostlist {
-    /*margin: 20px;*/
+    margin: 20px;
+}
+
+#taskobra-hostlist-header {
+    background-color: rgba(51, 204, 51, 0.4);
 }

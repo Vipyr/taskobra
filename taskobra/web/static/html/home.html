@@ -50,14 +50,18 @@
   <!--
       # Bottom Section of Body (Host List)
   -->
-  <div class="row table-responsive" id="taskobra-hostlist-pane">
+  <div class="row" id="taskobra-hostlist-pane">
       <!-- 
           Template for adding things to the list of hosts
           Not actually rendered on the page, only used in the JS
       -->
       <template id="taskobra-hostlist-entry">
         <tr>
-          <th scope="row">Check</th>
+          <th scope="row">
+            <div class="form-check d-flex align-items-center justify-content-center">
+              <input class="form-check-input position-static hostlist-checkbox" type="checkbox" value="" aria-label="Select host">
+            </div>
+          </th>
           <td class="hostlist-name"></td>
           <td class="hostlist-status"></td>
           <td class="hostlist-uptime"></td>
@@ -67,8 +71,8 @@
     
       <!-- Hostlist table section -->
       <div class="col" id="taskobra-hostlist">
-        <table class="table" id="taskobra-hostlist-table">
-          <thead>
+        <table class="table table-hover" id="taskobra-hostlist-table">
+          <thead id="taskobra-hostlist-header">
             <tr>
               <th scope="col"></th>
               <th scope="col">Hostname</th>

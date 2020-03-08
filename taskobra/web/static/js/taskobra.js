@@ -11,25 +11,20 @@ function render_hostlist(hostlist) {
   hostlist.forEach(host => {
     // Fill in the attrs of the instance
     var instance = template.content.cloneNode(true);
+    instance.querySelector(".hostlist-checkbox").value = host.hostname;
     instance.querySelector(".hostlist-name").textContent = host.hostname;
     instance.querySelector(".hostlist-status").textContent = host.status;
     instance.querySelector(".hostlist-uptime").textContent = host.uptime;
     instance.querySelector(".hostlist-misc").textContent = host.misc;
+    instance.querySelector("tr").addEventListener("click", function(event){
+      var hostlist_checkbox = event.currentTarget.querySelector(".hostlist-checkbox");
+      hostlist_checkbox.checked = !hostlist_checkbox.checked;
+    }, false);
 
     // Add it to the content section 
     document.querySelector("#taskobra-hostlist-entries").appendChild(instance);
   });
 }
-
-
-
-// Hostlist setup
-var hostlist = [
-  { hostname: "one", status: "good", uptime: "FOREVER", misc: "---->" }, 
-  { hostname: "too", status: "bad", uptime: "1h 64m 32s", misc: "---->" }, 
-  { hostname: "Thr33", status: "ok", uptime: "0h 0m 1s", misc: "---->" }
-]
-render_hostlist(hostlist);
 
 
 /* 
@@ -39,4 +34,11 @@ render_hostlist(hostlist);
 window.onload = (event) => {
   console.log( "taskobra.js: entered onload" );
 
+  // Hostlist setup
+  var hostlist = [
+    { hostname: "one", status: "good", uptime: "FOREVER", misc: "---->" }, 
+    { hostname: "too", status: "bad", uptime: "1h 64m 32s", misc: "---->" }, 
+    { hostname: "Thr33", status: "ok", uptime: "0h 0m 1s", misc: "---->" }
+  ]
+  render_hostlist(hostlist);
 };
