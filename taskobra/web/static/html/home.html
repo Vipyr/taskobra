@@ -3,40 +3,88 @@
 {% block title %} Home {% endblock %}
 
 {% block content %} 
-<div class="row" id="taskobra-metrics-pane">
-  <div class="col-md-2">
-    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-      <a class="nav-pill nav-link active" id="v-pills-overall-tab" data-toggle="pill" href="#v-pills-overall" role="tab" aria-controls="v-pills-overall" aria-selected="true">Overall</a>
-      <a class="nav-pill nav-link" id="v-pills-cpu-tab" data-toggle="pill" href="#v-pills-cpu" role="tab" aria-controls="v-pills-cpu" aria-selected="false">CPU</a>
-      <a class="nav-pill nav-link" id="v-pills-gpu-tab" data-toggle="pill" href="#v-pills-gpu" role="tab" aria-controls="v-pills-gpu" aria-selected="false">GPU</a>
-      <a class="nav-pill nav-link" id="v-pills-memory-tab" data-toggle="pill" href="#v-pills-memory" role="tab" aria-controls="v-pills-memory" aria-selected="false">Memory</a>
-      <a class="nav-pill nav-link" id="v-pills-storage-tab" data-toggle="pill" href="#v-pills-storage" role="tab" aria-controls="v-pills-storage" aria-selected="false">Storage</a>
-    </div>
-  </div>
-  <div class="col-md-10">
-    <!-- 
-        TODO: Two options with this section
-            1) Use javascript callbacks with the above nav-pill hrefs and redraw a single canvas
-            2) Render a seperate canvas for each metric below and keep (might be easier/faster)
+<div class="container-fluid">
+  <!--
+      # Top Section of Body (Tabs/Graphs)
+  -->
+  <div class="row" id="taskobra-metrics-pane">
+    <!--
+        # Left-Side Tabs Selectors 
     -->
-    <div class="tab-content" id="v-pills-tabContent">
-      <div class="tab-pane fade show active" id="v-pills-overall" role="tabpanel" aria-labelledby="v-pills-overall-tab">
-          Overall
+    <div class="col-md-2">
+      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-pill nav-link active" id="v-pills-overall-tab" data-toggle="pill" href="#v-pills-overall" role="tab" aria-controls="v-pills-overall" aria-selected="true">Overall</a>
+        <a class="nav-pill nav-link" id="v-pills-cpu-tab" data-toggle="pill" href="#v-pills-cpu" role="tab" aria-controls="v-pills-cpu" aria-selected="false">CPU</a>
+        <a class="nav-pill nav-link" id="v-pills-gpu-tab" data-toggle="pill" href="#v-pills-gpu" role="tab" aria-controls="v-pills-gpu" aria-selected="false">GPU</a>
+        <a class="nav-pill nav-link" id="v-pills-memory-tab" data-toggle="pill" href="#v-pills-memory" role="tab" aria-controls="v-pills-memory" aria-selected="false">Memory</a>
+        <a class="nav-pill nav-link" id="v-pills-storage-tab" data-toggle="pill" href="#v-pills-storage" role="tab" aria-controls="v-pills-storage" aria-selected="false">Storage</a>
       </div>
-      <div class="tab-pane fade" id="v-pills-cpu" role="tabpanel" aria-labelledby="v-pills-cpu-tab">
-          cpu
-      </div>
-      <div class="tab-pane fade" id="v-pills-gpu" role="tabpanel" aria-labelledby="v-pills-gpu-tab">
-          gpu
-      </div>
-      <div class="tab-pane fade" id="v-pills-memory" role="tabpanel" aria-labelledby="v-pills-memory-tab">
-          memory
-      </div>
-      <div class="tab-pane fade" id="v-pills-storage" role="tabpanel" aria-labelledby="v-pills-storage-tab">
-          storage
+    </div>
+    <div class="col-md-10">
+      <!-- 
+          # Right-Side Graph Canvas Panes 
+          TODO: Two options with this section
+              1) Use javascript callbacks with the above nav-pill hrefs and redraw a single canvas
+              2) Render a seperate canvas for each metric below and keep (might be easier/faster)
+      -->
+      <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="v-pills-overall" role="tabpanel" aria-labelledby="v-pills-overall-tab">
+            Overall
+        </div>
+        <div class="tab-pane fade" id="v-pills-cpu" role="tabpanel" aria-labelledby="v-pills-cpu-tab">
+            cpu
+        </div>
+        <div class="tab-pane fade" id="v-pills-gpu" role="tabpanel" aria-labelledby="v-pills-gpu-tab">
+            gpu
+        </div>
+        <div class="tab-pane fade" id="v-pills-memory" role="tabpanel" aria-labelledby="v-pills-memory-tab">
+            memory
+        </div>
+        <div class="tab-pane fade" id="v-pills-storage" role="tabpanel" aria-labelledby="v-pills-storage-tab">
+            storage
+        </div>
       </div>
     </div>
   </div>
 
+  <!--
+      # Bottom Section of Body (Host List)
+  -->
+  <div class="row table-responsive" id="taskobra-hostlist-pane">
+      <!-- 
+          Template for adding things to the list of hosts
+          Not actually rendered on the page, only used in the JS
+      -->
+      <template id="taskobra-hostlist-entry">
+        <tr>
+          <th scope="row">Check</th>
+          <td class="hostlist-name"></td>
+          <td class="hostlist-status"></td>
+          <td class="hostlist-uptime"></td>
+          <td class="hostlist-misc"></td>
+        </tr>
+      </template>
+    
+      <!-- Hostlist table section -->
+      <div class="col" id="taskobra-hostlist">
+        <table class="table" id="taskobra-hostlist-table">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Hostname</th>
+              <th scope="col">Status</th>
+              <th scope="col">Uptime</th>
+              <th scope="col">Misc</th>
+            </tr>
+          </thead>
+          <tbody id="taskobra-hostlist-entries">
+            <!--
+                This is where the actual content would be inserted
+            -->
+          </tbody>
+        </table>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

@@ -1,3 +1,6 @@
+/*
+    Navbar/Top of the Page
+*/
 .navbar {
     background-color: #33cc33;
 }
@@ -13,7 +16,9 @@
     height: 64px;
 }
 
-/* not active */
+/* 
+    Metrics Pane - Middle of the page 
+*/ 
 .nav-pills .nav-link:not(.active) {
     color: rgb(77, 77, 77);
     background-color: white; /*rgb(51, 204, 51);*/
@@ -34,4 +39,11 @@
 
 #taskobra-metrics-pane {
     padding: 20px;
+}
+
+/*
+    Hostlist - bottom of the page
+*/
+#taskobra-hostlist {
+    /*margin: 20px;*/
 }
