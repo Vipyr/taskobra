@@ -7,6 +7,7 @@ from .metric import Metric
 from .operating_system import OperatingSystem
 from .role import Role
 from .user import User
+from .snapshot import Snapshot
 from .storage import Storage
 from .system import System
 from .relationships import *

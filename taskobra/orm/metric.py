@@ -1,4 +1,5 @@
 # Libraries
+from functools import reduce
 import math
 from sqlalchemy import Column, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -7,47 +8,15 @@ from typing import Collection
 from taskobra.orm.base import ORMBase
 
 
-def combinatorial_mean_and_variance(l_mean, l_variance, l_N, r_mean, r_variance, r_N):
-    N = l_N + r_N
-    mean = (l_mean * l_N + r_mean * r_N) / N
-    l_square_sum = l_variance + l_mean ** 2
-    r_square_sum = r_variance + r_mean ** 2
-    square_sum = (l_square_sum * l_N + r_square_sum * r_N) / N
-    variance = square_sum - (mean ** 2)
-    return mean, variance
-
-
-class PruneStats:
-    def __init__(self):
-        self.mean = None
-        self.variance = None
-        self.sample_count = 0
-
-    def add(self, metric: "Metric"):
-        if self.mean is None:
-            self.mean = metric.value
-            self.variance = metric.variance
-            self.sample_count = metric.sample_count
-        else:
-            self.mean, self.variance = combinatorial_mean_and_variance(
-                self.mean,
-                self.variance,
-                self.sample_count,
-                metric.value,
-                metric.variance,
-                metric.sample_count
-            )
-            self.sample_count += metric.sample_count
-
-
 class Metric(ORMBase):
     __tablename__ = "Metric"
     unique_id = Column(Integer, primary_key=True)
-    value = Column(Float)
-    variance = Column(Float, default=0)
     sample_count = Column(Integer, default=1)
+    mean = Column(Float)
+    variance = Column(Float, default=0.0)
     metric_type = Column(Enum(
-        "DummyMetric",
+        "TestMetricMetric",
+        "TestSnapshotMetric",
     ))
 
     __mapper_args__ = {
@@ -58,20 +27,42 @@ class Metric(ORMBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if "variance" not in kwargs:
-            self.variance = 0.0
+            self.variance = type(self).variance.default.arg
         if "sample_count" not in kwargs:
-            self.sample_count = 1
-
-    @classmethod
-    def prune(cls, dummies: Collection["Metric"]):
-        stats = PruneStats()
-        [stats.add(dummy) for dummy in dummies]
-        return cls(
-            value=stats.mean,
-            variance=stats.variance,
-            sample_count=stats.sample_count,
-        )
+            self.sample_count = type(self).sample_count.default.arg
 
     @property
     def standard_deviation(self):
         return math.sqrt(self.variance)
+
+    @classmethod
+    def prune(cls, metrics: Collection["Metric"]):
+        if len(metrics) == 0:
+            yield None
+        if len(metrics) == 1:
+            yield metrics[0]
+        else:
+            yield reduce(cls.merge, metrics)
+
+    @classmethod
+    def merge(cls, lhs: "Metric", rhs: "Metric"):
+        if lhs is None:
+            sample_count=rhs.sample_count
+            mean=rhs.mean
+            variance=rhs.variance
+        else:
+            # Compute the new count, mean, and variance
+            # New count is just the sum of the two
+            sample_count = lhs.sample_count + rhs.sample_count
+            # New mean is the sum of the old sums divided by the new count
+            mean = (lhs.mean * lhs.sample_count + rhs.mean * rhs.sample_count) / sample_count
+            # Variance is the sum of the squares of all values divided by the count,
+            # minus the square of the mean.
+            # The new variance can be computed by recalculating the old sum of squares,
+            # adding them, dividing that by the new count, and finally subtracting
+            # the square of the new mean.
+            lhs_square_sum = lhs.variance + lhs.mean ** 2
+            rhs_square_sum = rhs.variance + rhs.mean ** 2
+            square_sum = (lhs_square_sum * lhs.sample_count + rhs_square_sum * rhs.sample_count) / sample_count
+            variance = square_sum - (mean ** 2)
+        return cls(sample_count=sample_count, mean=mean, variance=variance)
