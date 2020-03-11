@@ -1,6 +1,7 @@
 # Libraries
 from collections import defaultdict
 from datetime import timedelta
+from functools import reduce
 from sqlalchemy import DateTime, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from statistics import mean
@@ -29,8 +30,8 @@ class Snapshot(ORMBase):
 
     @classmethod
     def prune(cls, t0, snapshots: Collection["Snapshot"]):
-        t0 = min(t0, max(snapshot.timestamp for snapshot in snapshots))
-        print(f"Pruning from {t0}")
+        snap0 = reduce(lambda x, y: y if y.timestamp > x.timestamp else x, filter(lambda x: x.timestamp <= t0, snapshots))
+        print(f"snap0 = {snap0}")
         snapshot_iterable = reversed(
             sorted(
                 filter(
@@ -45,8 +46,8 @@ class Snapshot(ORMBase):
         sample_exponent = 1.0
         sample_rate = None
         sample_base = None
-        # time_slice = (snaps[0].timestamp, snaps[0].timestamp - timedelta(seconds=sample_rate * sample_base ** sample_exponent))
-        time_slice = (t0, t0)
+        dt = timedelta(seconds=snap0.sample_dt / 2)
+        time_slice = (snap0.timestamp - dt, snap0.timestamp + dt)
         for snapshot in snapshot_iterable:
             if time_slice and time_slice[0] > snapshot.timestamp >= time_slice[1]:
                 sample_rate = (sample_rate * len(snaps) + snapshot.sample_rate) / (len(snaps) + 1)
@@ -63,8 +64,8 @@ class Snapshot(ORMBase):
                         for snap in snaps
                     ]
                     pruned_metrics = []
-                    [pruned_metrics.extend(metric_type.prune(metric))
-                        for metric_type, metric in metrics_by_type.items()]
+                    [pruned_metrics.extend(metric_type.prune(metrics))
+                        for metric_type, metrics in metrics_by_type.items()]
                     prunes.append(
                         cls(
                             timestamp=(time_slice[0] + ((time_slice[1] - time_slice[0]) / 2)),
@@ -101,10 +102,6 @@ class Snapshot(ORMBase):
                 sample_exponent=sample_exponent,
             )
         )
-
-        for snap in prunes:
-            print(snap)
-            [print(f"    {metric}") for metric in snap.metrics]
         return prunes
 
     @property
@@ -113,4 +110,7 @@ class Snapshot(ORMBase):
 
     def __repr__(self):
         total_metrics = sum(metric.sample_count for metric in self.metrics)
-        return f"<Snapshot({self.timestamp} : {self.sample_rate:.3}*{self.sample_base:.3}^{self.sample_exponent:.3}({self.sample_dt:.3}) : {total_metrics})>"
+        dt = timedelta(seconds=self.sample_dt / 2)
+        t0 = (self.timestamp - dt).strftime("%d/%b/%y %H:%M:%S")
+        t1 = (self.timestamp + dt).strftime("%d/%b/%y %H:%M:%S")
+        return f"<Snapshot({t0} - {t1} : {self.sample_rate:.3}*{self.sample_base:.3}^{self.sample_exponent:.3}({self.sample_dt:.3}) : {total_metrics})>"
