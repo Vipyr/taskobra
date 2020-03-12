@@ -1,5 +1,6 @@
 # Libraries
 from functools import reduce
+import inspect
 import math
 from sqlalchemy import Column, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -23,13 +24,6 @@ class Metric(ORMBase):
         "polymorphic_identity": __tablename__,
         "polymorphic_on": metric_type,
     }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if "variance" not in kwargs:
-            self.variance = type(self).variance.default.arg
-        if "sample_count" not in kwargs:
-            self.sample_count = type(self).sample_count.default.arg
 
     @property
     def standard_deviation(self):

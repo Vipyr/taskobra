@@ -2,6 +2,7 @@
 from collections import defaultdict
 from datetime import timedelta
 from functools import reduce
+import inspect
 from sqlalchemy import DateTime, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from statistics import mean
@@ -19,19 +20,9 @@ class Snapshot(ORMBase):
     sample_base = Column(Float, default=2.0)
     sample_exponent = Column(Float, default=0.0)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if "sample_rate" not in kwargs:
-            self.sample_rate = type(self).sample_rate.default.arg
-        if "sample_base" not in kwargs:
-            self.sample_base = type(self).sample_base.default.arg
-        if "sample_exponent" not in kwargs:
-            self.sample_exponent = type(self).sample_exponent.default.arg
-
     @classmethod
     def prune(cls, t0, snapshots: Collection["Snapshot"]):
         snap0 = reduce(lambda x, y: y if y.timestamp > x.timestamp else x, filter(lambda x: x.timestamp <= t0, snapshots))
-        print(f"snap0 = {snap0}")
         snapshot_iterable = reversed(
             sorted(
                 filter(

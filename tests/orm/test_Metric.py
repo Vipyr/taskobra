@@ -20,6 +20,11 @@ class TestMetricMetric(Metric):
 
 
 class TestMetric(ORMTestCase):
+    def test_creation(self):
+        metric = Metric()
+        self.assertEqual(metric.variance, Metric.variance.default.arg)
+        self.assertEqual(metric.sample_count, Metric.sample_count.default.arg)
+
     def test_prune(self):
         with get_session(bind=get_engine("sqlite:///:memory:")) as session:
             session.add(TestMetricMetric(mean=2))

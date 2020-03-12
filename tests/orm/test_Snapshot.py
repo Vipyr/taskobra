@@ -22,14 +22,11 @@ class TestSnapshotMetric(Metric):
 
     @classmethod
     def prune(cls, metrics: Collection["TestSnapshotMetric"]):
-        # print("pruning", metrics)
         by_field = defaultdict(list)
         [by_field[metric.field].append(metric) for metric in metrics]
         for field, metrics in by_field.items():
-            # print(field, metrics)
             for metric in super().prune(metrics):
                 metric.field = field
-                # print("    yielding", metric)
                 yield metric
 
     def __repr__(self):
@@ -42,6 +39,12 @@ class TestSnapshotMetric(Metric):
 
 
 class TestSnapshot(ORMTestCase):
+    def test_creation(self):
+        snapshot = Snapshot()
+        self.assertEqual(snapshot.sample_rate, Snapshot.sample_rate.default.arg)
+        self.assertEqual(snapshot.sample_base, Snapshot.sample_base.default.arg)
+        self.assertEqual(snapshot.sample_exponent, Snapshot.sample_exponent.default.arg)
+
     def test_prune(self):
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
@@ -71,10 +74,9 @@ class TestSnapshot(ORMTestCase):
         for snapshot in pruned_snapshots:
             print(snapshot)
             [print(f"    {metric}") for metric in snapshot.metrics]
-        pruned_snapshots.append(
-            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 55), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
-        )
+
         print()
+        pruned_snapshots.append(Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 55), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]))
         pruned_snapshots = Snapshot.prune(datetime(2020, 3, 9, 9, 55, 57), pruned_snapshots)
         print("Pruned:")
         for snapshot in pruned_snapshots:
