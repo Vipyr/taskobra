@@ -1,7 +1,5 @@
 from .ORMTestCase import ORMTestCase
-from functools import reduce
-from math import sqrt
-from sqlalchemy import create_engine, Column, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer
 import statistics
 from taskobra.orm import get_engine, get_session, Metric
 

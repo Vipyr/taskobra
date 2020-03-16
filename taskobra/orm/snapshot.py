@@ -2,14 +2,13 @@
 from collections import defaultdict
 from datetime import timedelta
 from functools import reduce
-import inspect
-from sqlalchemy import DateTime, Column, Float, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Column, Float, Integer
 from sqlalchemy.orm import relationship
-from statistics import mean
 from typing import Collection
 # Taskobra
 from taskobra.orm.base import ORMBase
 from taskobra.orm.relationships.snapshot_metric import snapshot_metric_table
+
 
 class Snapshot(ORMBase):
     __tablename__ = "Snapshot"

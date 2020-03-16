@@ -7,7 +7,6 @@ from sqlalchemy.ext.declarative.api import _declarative_constructor
 from sqlalchemy.orm import sessionmaker
 
 
-
 def __init__ORMBase(self, *args, **kwargs):
     _declarative_constructor(self, *args, **kwargs)
     for name, member in inspect.getmembers(type(self)):

@@ -2,11 +2,8 @@
 from .ORMTestCase import ORMTestCase
 # Libraries
 from collections import defaultdict
-from datetime import datetime, timedelta
-from functools import reduce
-from math import sqrt
-from sqlalchemy import create_engine, Column, ForeignKey, Integer
-import statistics
+from datetime import datetime
+from sqlalchemy import Column, ForeignKey, Integer
 from typing import Collection
 # Taskobra
 from taskobra.orm import get_engine, get_session, Metric, Snapshot
