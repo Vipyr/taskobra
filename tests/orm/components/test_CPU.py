@@ -1,4 +1,4 @@
-from .ORMTestCase import ORMTestCase
+from ..ORMTestCase import ORMTestCase
 from sqlalchemy import create_engine
 from taskobra.orm import get_engine, get_session, CPU, GPU, System
 

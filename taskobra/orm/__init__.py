@@ -4,5 +4,6 @@ from .metrics import Metric
 from .role import Role
 from .user import User
 from .snapshot import Snapshot
+from .snapshot_control import SnapshotControl
 from .system import System
 from .relationships import SystemComponent, user_role_table, UserSystemRole

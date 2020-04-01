@@ -104,3 +104,19 @@ class Snapshot(ORMBase):
         t0 = (self.timestamp - dt).strftime("%d/%b/%y %H:%M:%S")
         t1 = (self.timestamp + dt).strftime("%d/%b/%y %H:%M:%S")
         return f"<Snapshot({t0} - {t1} : {self.sample_rate:.3}*{self.sample_base:.3}^{self.sample_exponent:.3}({self.sample_dt:.3}) : {total_metrics})>"
+
+    def __eq__(self, other: "Snapshot"):
+        return (
+            self.timestamp == other.timestamp and
+            self.sample_base == other.sample_base and
+            self.sample_exponent == other.sample_exponent and
+            self.sample_rate == other.sample_rate and
+            len(self.metrics) == len(other.metrics)
+        )
+
+
+    timestamp = Column(DateTime)
+    metrics = relationship("Metric", secondary=snapshot_metric_table)
+    sample_rate = Column(Float, default=1.0)
+    sample_base = Column(Float, default=2.0)
+    sample_exponent = Column(Float, default=0.0)
