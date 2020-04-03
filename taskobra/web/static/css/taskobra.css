@@ -13,7 +13,8 @@ html, body {
     Navbar/Top of the Page
 */
 .navbar {
-    background-color: #33cc33;
+    /*background-color: #33cc33;*/
+    background-color: rgba(51, 204, 51, 0.6);
 }
   
 #taskobra-navbar .navbar-brand {

@@ -19,7 +19,7 @@ def create_app():
             static_folder='static')         # Root Path for url_for('static')
 
     # Load config from ENV 
-    app.config['DATABASE_URI'] = os.environ.get('DATABASE', 'sqlite:///taskobra.sqlite.db')
+    app.config['DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
     # TODO: OAuth Key
     # TODO: ???
     
