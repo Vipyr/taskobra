@@ -24,11 +24,11 @@ class TestDatabase(object):
         return self.session
 
     def __exit__(self, type, value, traceback):
-        if type is None:
-            self.session.commit()
+        if (type is None) or (type is KeyboardInterrupt):
             self.session.close()
-        else:
-            self.session.rollback()
-            self.session.close()
-        return True
+            if ':memory:' not in self.database_uri:
+                database_file = self.database_uri.split('///')[-1]
+                print(f"Deleting test database at: {database_file}")
+                os.remove(database_file)
+            return True
 

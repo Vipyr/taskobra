@@ -13,6 +13,6 @@ if __name__ == "__main__":
         Debug for the WSGI Werkzeug server is turned ON, which will expose you to remote attacks
         Only ever use this with localhost and test environments!
     """
-    with TestDatabase(f"sqlite:///taskobra.{os.getpid()}.sqlite.db", fake_systems_generator):
+    with TestDatabase(f"sqlite:////tmp/taskobra.{os.getpid()}.sqlite.db", fake_systems_generator):
         app = create_app()
         app.run(host='localhost', debug=True)
