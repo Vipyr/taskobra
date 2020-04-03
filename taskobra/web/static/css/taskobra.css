@@ -1,0 +1,63 @@
+
+/*
+    Full Page
+*/
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+
+
+/*
+    Navbar/Top of the Page
+*/
+.navbar {
+    background-color: #33cc33;
+}
+  
+#taskobra-navbar .navbar-brand {
+  font-size: 48px;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  color: #4d4d4d;
+}
+
+#taskobra-icon {
+    width: 64px;
+    height: 64px;
+}
+
+/* 
+    Metrics Pane - Middle of the page 
+*/ 
+.nav-pills .nav-link:not(.active) {
+    color: rgb(77, 77, 77);
+    background-color: white; /*rgb(51, 204, 51);*/
+    border: solid;
+    border-color: rgba(51, 204, 51, 1.0);
+    border-width: 1px;
+}
+
+.nav-pills .nav-link.active {
+    background-color: rgba(51, 204, 51, 0.4);
+    color: rgb(77, 77, 77);
+}
+
+.nav-pill {
+    margin-bottom: 5px;
+}
+
+#taskobra-metrics-pane {
+    padding: 20px;
+}
+
+/*
+    Hostlist - bottom of the page
+*/
+#taskobra-hostlist {
+    margin: 20px;
+}
+
+#taskobra-hostlist-header {
+    background-color: rgba(51, 204, 51, 0.4);
+}
