@@ -59,3 +59,15 @@ class Metric(ORMBase):
             square_sum = (lhs_square_sum * lhs.sample_count + rhs_square_sum * rhs.sample_count) / sample_count
             variance = square_sum - (mean ** 2)
         return cls(sample_count=sample_count, mean=mean, variance=variance)
+
+    def __hash__(self):
+        return id(self)
+
+    def __eq__(self, other: "Metric"):
+        return (
+            self.sample_count == other.sample_count and
+            self.mean         == other.mean         and
+            self.variance     == other.variance     and
+            self.metric_type  == other.metric_type
+        )
+

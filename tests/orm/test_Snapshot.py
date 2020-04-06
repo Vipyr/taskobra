@@ -6,6 +6,7 @@ from datetime import datetime
 from random import shuffle
 from sqlalchemy import Column, ForeignKey, Integer
 from typing import Collection
+from unittest import skip
 # Taskobra
 from taskobra.orm import get_engine, get_session, Metric, Snapshot
 
@@ -43,6 +44,21 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(snapshot.sample_base, Snapshot.sample_base.default.arg)
         self.assertEqual(snapshot.sample_exponent, Snapshot.sample_exponent.default.arg)
 
+    def test_merge(self):
+        snapshot0 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 52), metrics=[TestSnapshotMetric(field=0, mean=2.0)])
+        snapshot1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=4.0)])
+        pruned = snapshot0.merge(snapshot1)
+        expected = Snapshot(
+            timestamp=datetime(2020, 3, 9, 9, 53, 51),
+            metrics=[TestSnapshotMetric(field=0, mean=3.0, sample_count=2, variance=1.0)],
+            sample_count=2,
+            sample_exponent=2.0,
+        )
+        self.assertEqual(pruned, expected)
+        with self.assertRaises(ValueError):
+            pruned = snapshot1.merge(snapshot0)
+
+    @skip("Pruning Algorithm Still In Progress")
     def test_prune(self):
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
@@ -92,7 +108,7 @@ class TestSnapshot(ORMTestCase):
         # self.assertEqual(pruned_all, Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), pruned_all))
 
         # Make sure that pruning [:7] + [7:] yields the same results as pruning all of the snapshots
-        # self.assertEqual(
-        #     Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), pruned_0_6 + pruned_7_13),
-        #     pruned_all,
-        # )
+        self.assertEqual(
+            Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), pruned_0_6 + pruned_7_13),
+            pruned_all,
+        )
