@@ -3,6 +3,7 @@ from .ORMTestCase import ORMTestCase
 # Libraries
 from collections import defaultdict
 from datetime import datetime
+from itertools import chain
 from math import log
 from random import shuffle
 from sqlalchemy import Column, ForeignKey, Integer
@@ -78,13 +79,15 @@ class TestSnapshot(ORMTestCase):
         merge = snapshot.merge(identity)
         self.assertEqual(snapshot, merge)
 
-    @skip("Pruning Algorithm Still In Progress")
+    # @skip("Pruning Algorithm Still In Progress")
     def test_prune(self):
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
         ]
+        [print(item) for item in Snapshot.prune(sorted(snapshots, key=lambda snap: snap.timestamp))]
+        return
 
 
 

@@ -6,6 +6,7 @@ from itertools import chain
 from math import log
 from sqlalchemy import DateTime, Column, Float, Integer
 from sqlalchemy.orm import relationship
+from typing import Generator
 from typing import Iterable
 # Taskobra
 from taskobra.orm.base import ORMBase
@@ -81,7 +82,20 @@ class Snapshot(ORMBase):
             each time a new timeslice is finished off.
             `snapshots` must be sorted by timestamp from youngest to oldest (descending)
         """
+        if not isinstance(snapshots, Generator):
+            snapshots = chain(snapshots)
         pruned = next(snapshots)
+
+        # Base the time slices on only t_end, going
+        # backwards in time by using the rate/base
+        # and starting with an exponent of 1.0.
+        # Collect up and merge all snapshots
+        # that fall in that window, then increment
+        # the exponent and move on to the t_start
+        # of the previous range.  Do this until
+        # we run out of data to consume.
+        t_end = pruned.t_end
+
         for snapshot in snapshots:
             if pruned.covers(snapshot):
                 pruned = pruned.merge(snapshot)
