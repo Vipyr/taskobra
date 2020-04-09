@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import timedelta
 from functools import reduce
 from itertools import chain
+from math import log
 from sqlalchemy import DateTime, Column, Float, Integer
 from sqlalchemy.orm import relationship
 from typing import Iterable
@@ -37,37 +38,41 @@ class Snapshot(ORMBase):
         return self.t_start <= other.timestamp < self.t_end
 
     def merge(self, other: "Snapshot"):
-        """ Merges two adjacent Snapshots together.  Expects self to be
-            younger than other
+        """ Merges two Snapshots together.
         """
-        if self.timestamp < other.timestamp:
-            raise ValueError(f"Attempt to merge Snapshots out of order {self}.merge({other})")
+        younger, older = sorted((self, other), key=lambda snap: snap.timestamp)
 
-        sample_count = self.sample_count + other.sample_count
-        sample_rate = (self.sample_rate * self.sample_count + other.sample_rate * other.sample_count) / sample_count
-        sample_base = (self.sample_base * self.sample_count + other.sample_base * other.sample_count) / sample_count
-        sample_exponent = max(self.sample_exponent, other.sample_exponent)
+        sample_count = younger.sample_count + older.sample_count
+        sample_rate = (younger.sample_rate * younger.sample_count + older.sample_rate * older.sample_count) / sample_count
+        sample_base = (younger.sample_base * younger.sample_count + older.sample_base * older.sample_count) / sample_count
+        # sample_exponent = max(younger.sample_exponent, older.sample_exponent)
+        t_start = min(younger.t_start, older.t_start)
+        t_end = max(younger.t_end, older.t_end)
+        sample_dt = t_end - t_start
+        timestamp = t_start + sample_dt / 2
+        sample_exponent = log(sample_dt.total_seconds(), sample_base)
 
         # Create the new Snapshot with the time information,
         # and a guess about the exponent.
         metrics_by_type = defaultdict(list)
-        [metrics_by_type[type(metric)].append(metric) for metric in self.metrics]
-        [metrics_by_type[type(metric)].append(metric) for metric in other.metrics]
+        [metrics_by_type[type(metric)].append(metric) for metric in younger.metrics]
+        [metrics_by_type[type(metric)].append(metric) for metric in older.metrics]
         pruned_metrics = []
         [pruned_metrics.extend(metric_type.prune(metrics)) for metric_type, metrics in metrics_by_type.items()]
         merged = Snapshot(
             metrics=pruned_metrics,
+            timestamp=timestamp,
             sample_count=sample_count,
             sample_rate=sample_rate,
             sample_base=sample_base,
             sample_exponent=sample_exponent,
         )
-        # Compute a weighted average of the timestamps, adjusted by sample count.
-        merged.timestamp = other.timestamp + (self.timestamp - other.timestamp) * self.sample_count / merged.sample_count
-        # Expand the merged time slice until it covers both Snapshots
-        while not (merged.covers(self) and merged.covers(other)):
-            merged.sample_exponent += 1
-            merged.timestamp = other.timestamp + (self.timestamp - other.timestamp) * self.sample_count / merged.sample_count
+        # # Compute a new timestamp
+        # merged.timestamp = older.timestamp + (younger.timestamp - older.timestamp) * younger.sample_count / merged.sample_count
+        # # Expand the merged time slice until it covers both Snapshots
+        # while not (merged.covers(younger) and merged.covers(older)):
+        #     merged.sample_exponent += 1
+        #     merged.timestamp = older.timestamp + (younger.timestamp - older.timestamp) * younger.sample_count / merged.sample_count
         return merged
 
     @classmethod
@@ -76,9 +81,8 @@ class Snapshot(ORMBase):
             each time a new timeslice is finished off.
             `snapshots` must be sorted by timestamp from youngest to oldest (descending)
         """
-        snapshot_iterable = chain(snapshots)
-        pruned = next(snapshot_iterable)
-        for snapshot in snapshot_iterable:
+        pruned = next(snapshots)
+        for snapshot in snapshots:
             if pruned.covers(snapshot):
                 pruned = pruned.merge(snapshot)
             else:
@@ -89,7 +93,7 @@ class Snapshot(ORMBase):
         return
 
         snap0 = next(snapshots)
-        snapshot_iterable = reversed(
+        snapshots = reversed(
             sorted(
                 snapshots,
                 key=lambda snapshot: snapshot.timestamp,
@@ -102,7 +106,7 @@ class Snapshot(ORMBase):
         sample_base = None
         dt = timedelta(seconds=snap0.sample_dt / 2)
         time_slice = (snap0.timestamp - dt, snap0.timestamp + dt)
-        for snapshot in snapshot_iterable:
+        for snapshot in snapshots:
             if time_slice and time_slice[0] > snapshot.timestamp >= time_slice[1]:
                 sample_rate = (sample_rate * len(snaps) + snapshot.sample_rate) / (len(snaps) + 1)
                 sample_base = (sample_base * len(snaps) + snapshot.sample_base) / (len(snaps) + 1)
@@ -160,10 +164,12 @@ class Snapshot(ORMBase):
 
     def __repr__(self):
         total_metrics = sum(metric.sample_count for metric in self.metrics)
-        t0 = self.t_start.strftime("%d/%b/%y %H:%M:%S.%f")
-        t1 = self.t_end.strftime("%d/%b/%y %H:%M:%S.%f")
+        t0 = self.t_start
+        t1 = self.t_end
+        t0s = f"{t0.strftime('%d/%b/%y %H:%M:%S')}.{t0.microsecond // 10000}"
+        t1s = f"{t1.strftime('%d/%b/%y %H:%M:%S')}.{t1.microsecond // 10000}"
         dt = self.sample_rate * self.sample_base ** self.sample_exponent
-        return f"<Snapshot({t0} - {t1} : {self.sample_rate:.3}*{self.sample_base:.3}^{self.sample_exponent:.3}({dt:.3}) : {total_metrics})>"
+        return f"<Snapshot({t0s} - {t1s} : {self.sample_rate:.3}*{self.sample_base:.3}^{self.sample_exponent:.3}({dt:.3}) : {total_metrics})>"
 
     def __eq__(self, other: "Snapshot"):
         return (
