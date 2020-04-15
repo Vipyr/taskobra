@@ -1,5 +1,5 @@
 
-# Test Approach
+# Test Approach Documentation
 
 ## Contents
 - [Overview and Scope](#overview-and-scope)

@@ -36,5 +36,5 @@ Taskobra is made up of three main components:
 - [Authentication](auth.md)
 - [Deployment Model](deployment.md)
 - [Contributing](elves.md)
-- [Test Approach](testapproach.md)
+- [Test Approach Documentation](testapproach.md)
 - [References](references.md)
