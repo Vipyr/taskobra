@@ -101,10 +101,15 @@ The result is a Flask webserver running in debug mode on localhost. The dedicate
 
 ### Bug Reporting 
 
-- Bug handling process 
-    - Github Issues
-    - Triage of GitHub issues
-    - Handling pull requests 
+Bug reporting is key piece of the testing process. For Taskobra, bug reporting is done via GitHub Issues with a number of templates available based on the component being selected. Bugs can be opened by anyone, including contributors and users themselves, directly to the GitHub Issues queue. 
+
+![Taskobra Issues](images/taskobra_gh_issue_templates.PNG)
+
+Issues are then triaged using the GitHub Project, alongside pending features and enhancements. There are four stages issues can exist in: ToDo, In Progress, Review/QA, and Done. Issues are prioritized in ToDo and then progress through the stages as they're worked on. 
+
+![Taskobra Project](images/taskobra_gh_project.PNG)
+
+There is an expectation that contributors include unit tests for any new features as part of a pre-requisite to their content being accepted into the main trunk. 
 
 ## Continuous Integration
 
