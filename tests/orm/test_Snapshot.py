@@ -47,99 +47,124 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(snapshot.sample_exponent, Snapshot.sample_exponent.default.arg)
 
     def test_merge_commutative_property(self):
+        exp1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 52), sample_exponent=1, sample_count=0)
         snapshot0 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 52), metrics=[TestSnapshotMetric(field=0, mean=2.0)])
         snapshot1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=4.0)])
-        expected = Snapshot(
-            timestamp=datetime(2020, 3, 9, 9, 53, 51),
-            metrics=[TestSnapshotMetric(field=0, mean=3.0, sample_count=2, variance=1.0)],
-            sample_count=2,
-            sample_exponent=log(3.0, 2),
-        )
-        self.assertEqual(expected, snapshot0.merge(snapshot1))
-        self.assertEqual(expected, snapshot1.merge(snapshot0))
-
-    def test_merge_associative_property(self):
-        snapshot0 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)])
-        snapshot1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)])
-        snapshot2 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)])
-        merge_01_2 = snapshot0.merge(snapshot1).merge(snapshot2)
-        merge_0_12 = snapshot0.merge(snapshot1.merge(snapshot2))
-        self.assertEqual(merge_01_2.t_start, snapshot2.t_start)
-        self.assertEqual(merge_01_2.t_end, snapshot0.t_end)
-        self.assertEqual(merge_01_2.sample_count, merge_0_12.sample_count)
-        self.assertEqual(merge_01_2.sample_rate, merge_0_12.sample_rate)
-        self.assertEqual(merge_01_2.sample_base, merge_0_12.sample_base)
-        self.assertEqual(merge_01_2.sample_exponent, merge_0_12.sample_exponent)
-        self.assertEqual(merge_01_2.timestamp, merge_0_12.timestamp)
-        self.assertEqual(merge_01_2, merge_0_12)
+        result01 = exp1.merge(snapshot0).merge(snapshot1)
+        result10 = exp1.merge(snapshot1).merge(snapshot0)
+        self.assertEqual(result01, result10)
+        self.assertEqual(result01.sample_count, 2)
+        self.assertEqual(result01.sample_rate, 1.0)
+        self.assertEqual(result01.sample_base, 2.0)
+        self.assertEqual(result01.sample_exponent, 1)
+        self.assertEqual(len(result01.metrics), 1)
+        self.assertEqual(result01.metrics[0].mean, 3.0)
+        self.assertEqual(result01.metrics[0].standard_deviation, 1.0)
+        self.assertEqual(result01.metrics[0].sample_count, 2)
 
     def test_merge_identity_property(self):
+        identity = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), sample_count=0, sample_exponent=1)
         snapshot = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)])
-        identity = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), sample_count=0)
-        merge = snapshot.merge(identity)
-        self.assertEqual(snapshot, merge)
+        merge = identity.merge(snapshot)
 
-    # @skip("Pruning Algorithm Still In Progress")
+        self.assertEqual(merge.sample_count,                  snapshot.sample_count)
+        self.assertEqual(merge.sample_rate,                   snapshot.sample_rate)
+        self.assertEqual(merge.sample_base,                   snapshot.sample_base)
+        self.assertEqual(merge.sample_exponent,               1)
+        self.assertEqual(len(merge.metrics),                  len(snapshot.metrics))
+        self.assertEqual(merge.metrics[0].mean,               snapshot.metrics[0].mean)
+        self.assertEqual(merge.metrics[0].standard_deviation, snapshot.metrics[0].standard_deviation)
+        self.assertEqual(merge.metrics[0].sample_count,       snapshot.metrics[0].sample_count)
+
+    # @skip("rawr")
     def test_prune(self):
+        # snapshots = [
+        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
+        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
+        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
+        # ]
+        # prune1 = [item for item in Snapshot.prune(reversed(sorted(snapshots, key=lambda snap: snap.timestamp)))]
+        # prune2 = [item for item in prune1]
+        # self.assertEqual(prune1, prune2)
+
+        # print()
+        # [print(s) for s in prune1]
+        # self.assertLess(len(prune1), len(snapshots))
+
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
-        ]
-        [print(item) for item in Snapshot.prune(sorted(snapshots, key=lambda snap: snap.timestamp))]
-        return
 
-
-
-
-        snapshots = [
-            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
-            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
-            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 47), metrics=[TestSnapshotMetric(field=0, mean=3.5), TestSnapshotMetric(field=1, mean=5.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 40), metrics=[TestSnapshotMetric(field=0, mean=4.5), TestSnapshotMetric(field=1, mean=6.5)]),
+
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 35), metrics=[TestSnapshotMetric(field=0, mean=5.5), TestSnapshotMetric(field=1, mean=7.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 29), metrics=[TestSnapshotMetric(field=0, mean=6.5), TestSnapshotMetric(field=1, mean=8.5)]),
-            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 28), metrics=[TestSnapshotMetric(field=0, mean=7.5), TestSnapshotMetric(field=1, mean=9.5)]),
+            Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 28), metrics=[TestSnapshotMetric(field=0, mean=7.5), TestSnapshotMetric(field=1, mean=9.5)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 27), metrics=[TestSnapshotMetric(field=0, mean=8.5), TestSnapshotMetric(field=1, mean=1.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 25), metrics=[TestSnapshotMetric(field=0, mean=9.5), TestSnapshotMetric(field=1, mean=2.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 20), metrics=[TestSnapshotMetric(field=0, mean=1.5), TestSnapshotMetric(field=1, mean=3.5)]),
+
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53,  5), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53,  1), metrics=[TestSnapshotMetric(field=0, mean=3.5), TestSnapshotMetric(field=1, mean=5.5)]),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53,  0), metrics=[TestSnapshotMetric(field=0, mean=4.5), TestSnapshotMetric(field=1, mean=6.5)]),
         ]
+        sorted_snapshots = list(reversed(sorted(snapshots, key=lambda snap: snap.timestamp)))
+        pruned = [item for item in Snapshot.prune(sorted_snapshots)]
+        self.assertLess(len(pruned), len(snapshots))
+
+        # # Assert that pruning the same data twice yields the same result
+        # print()
+        # print("Prune Twice")
+        # prune1 = [item for item in Snapshot.prune(sorted_snapshots)]
+        # self.assertEqual(pruned, prune1)
+
+        # # Assert that pruning the result of a prune yields the same result
+        # print()
+        # print("Prune Again")
+        # prune1 = [item for item in Snapshot.prune(pruned)]
+        # self.assertEqual(pruned, prune1)
+
+        prune1 = []
+        for i in reversed(range(len(snapshots)-1)):
+            print()
+            print("Prune Incremental", i)
+            prune1 = [item for item in Snapshot.prune(
+                chain(
+                    [sorted_snapshots[i]],
+                    prune1
+                )
+            )]
+
+        return
+
+        # Assert that adding an element to the middle of the range yields the same result
+        # as pruning would if it had existed the entire time
+        for i in range(len(snapshots)-1):
+            print()
+            print("Prune Late Entry", i)
+            prune1 = [item for item in Snapshot.prune(chain(sorted_snapshots[0:i], sorted_snapshots[i+1:]))]
+            sorted_prune1_plus_element = list(reversed(sorted(chain(prune1, [sorted_snapshots[i]]), key=lambda snap: snap.timestamp)))
+            prune2 = [item for item in Snapshot.prune(sorted_prune1_plus_element)]
+            self.assertEqual(pruned, prune2)
+
+
+        return
 
         print()
-        for snapshot in snapshots:
-            print(snapshot)
-            # [print(f"    {metric}") for metric in snapshot.metrics]
+        print("prune_0_6")
+        prune_0_6 = [item for item in Snapshot.prune(sorted_snapshots[:len(sorted_snapshots)//2])]
+        # [print(s) for s in prune_0_6]
 
         print()
-        pruned_0_6 = Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), sorted(snapshots[:7]))
-        print("Pruned:")
-        for snapshot in pruned_0_6:
-            print(snapshot)
-            [print(f"    {metric}") for metric in snapshot.metrics]
+        print("prune_7_13")
+        prune_7_13 = [item for item in Snapshot.prune(sorted_snapshots[len(sorted_snapshots)//2:])]
+        # [print(s) for s in prune_7_13]
 
         print()
-        # pruned_7_13.append(Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 55), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]))
-        pruned_7_13 = Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), sorted(snapshots[7:]))
-        print("Pruned:")
-        for snapshot in pruned_7_13:
-            print(snapshot)
-            [print(f"    {metric}") for metric in snapshot.metrics]
+        print("prune")
+        prune = [item for item in Snapshot.prune(chain(prune_0_6, prune_7_13))]
+        # [print(s) for s in prune]
 
-        # Make sure that pruning the result of a prune doesn't change it
-        print()
-        pruned_all = Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), sorted(snapshots))
-        print("Pruned:")
-        for snapshot in pruned_all:
-            print(snapshot)
-            [print(f"    {metric}") for metric in snapshot.metrics]
-        # self.assertEqual(pruned_all, Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), pruned_all))
-
-        # Make sure that pruning [:7] + [7:] yields the same results as pruning all of the snapshots
-        self.assertEqual(
-            Snapshot.prune(datetime(2020, 3, 9, 9, 53, 53), pruned_0_6 + pruned_7_13),
-            pruned_all,
-        )
+        # self.assertEqual(prune, prune1)
