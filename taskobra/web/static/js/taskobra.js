@@ -3,12 +3,11 @@
       Specializes the <template> in the home.html sheet
       https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
 */
-function render_hostlist(hostlist) {
+function render_systems(system_list) {
   console.log( "taskobra.js: entered render_hostlist" );
   // Construct the instance of the template
   var template = document.querySelector('#taskobra-hostlist-entry');
-
-  hostlist.forEach(host => {
+  system_list.forEach(host => {
     // Fill in the attrs of the instance
     var instance = template.content.cloneNode(true);
     instance.querySelector(".hostlist-checkbox").value = host.hostname;
@@ -66,12 +65,9 @@ window.onload = (event) => {
   console.log( "taskobra.js: entered onload" );
 
   // Hostlist setup
-  var hostlist = [
-    { hostname: "one", status: "good", uptime: "FOREVER", misc: "---->" }, 
-    { hostname: "too", status: "bad", uptime: "1h 64m 32s", misc: "---->" }, 
-    { hostname: "Thr33", status: "ok", uptime: "0h 0m 1s", misc: "---->" }
-  ]
-  render_hostlist(hostlist);
+  $.ajax({url: "/api/systems", success: function(result) { 
+    render_systems(JSON.parse(result));
+  }});
 
   // Charting setup
   // Load the Visualization API and the corechart package.

@@ -13,12 +13,15 @@ def base():
     """
     return jsonify({})
     
-@blueprint.route('/hostnames')
+@blueprint.route('/systems')
 def hostnames():
     """
     Base API Route, not sure what this should return
     Probably TODO remove, and replace with interesting routes 
     """
-    hostnames = [system.name for system in System.query.all()]
-    return json.dumps(hostnames)
+    systems = [
+        {'hostname': system.name, 'status' : 'Good', 'uptime': '00:00:00', 'misc': '' }
+        for system in System.query.all()
+    ]
+    return json.dumps(systems)
     
