@@ -4,7 +4,7 @@ from taskobra.web import create_app
 
 class WebTestCase(TestCase):
     def setUp(self):
-        self.app = create_app(config="DEBUG") # TODO: Update when configs are a thing
+        self.app = create_app()
 
     def tearDown(self):
         self.app = None

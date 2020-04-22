@@ -28,7 +28,7 @@ def create_app():
     app.register_blueprint(ui.blueprint)
 
     # Set Up Database Bindings
-    engine = create_engine(app.config['DATABASE_URI'], convert_unicode=True)
+    engine = create_engine(app.config['DATABASE_URI'])
     db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
     ORMBase.query = db_session.query_property()
     ORMBase.metadata.create_all(bind=engine)
