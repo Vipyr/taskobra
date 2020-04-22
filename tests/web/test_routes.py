@@ -23,3 +23,9 @@ class TestRoutes(WebTestCase):
             rsp = client.get('/api/')
             assert rsp.content_type == 'application/json'
             assert rsp.status_code == 200
+
+    def test_api_systems_route(self):
+        with self.app.test_client() as client:
+            rsp = client.get('/api/systems')
+            assert rsp.content_type == 'application/json'
+            assert rsp.status_code == 200

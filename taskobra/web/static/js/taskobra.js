@@ -65,9 +65,7 @@ window.onload = (event) => {
   console.log( "taskobra.js: entered onload" );
 
   // Hostlist setup
-  $.ajax({url: "/api/systems", success: function(result) { 
-    render_systems(JSON.parse(result));
-  }});
+  $.ajax({url: "/api/systems", success: render_systems});
 
   // Charting setup
   // Load the Visualization API and the corechart package.

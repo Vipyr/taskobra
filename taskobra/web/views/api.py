@@ -23,5 +23,5 @@ def hostnames():
         {'hostname': system.name, 'status' : 'Good', 'uptime': '00:00:00', 'misc': '' }
         for system in System.query.all()
     ]
-    return json.dumps(systems)
+    return jsonify(systems)
     
