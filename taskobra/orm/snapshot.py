@@ -97,7 +97,7 @@ class Snapshot(ORMBase):
 
         pruned = Snapshot(sample_count=0, sample_exponent=1)
 
-        for snapshot in chain(snapshots):
+        for snapshot in snapshots:
             try:
                 pruned = pruned.merge(snapshot)
             except Snapshot.UnmergableException:
