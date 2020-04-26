@@ -49,10 +49,16 @@ class TestSnapshot(ORMTestCase):
     def test_merge_commutative_property(self):
         exp1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 52), sample_exponent=1, sample_count=0)
         snapshot0 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 52), metrics=[TestSnapshotMetric(field=0, mean=2.0)])
-        snapshot1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=4.0)])
-        result01 = exp1.merge(snapshot0).merge(snapshot1)
-        result10 = exp1.merge(snapshot1).merge(snapshot0)
+        snapshot1 = Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 51), metrics=[TestSnapshotMetric(field=0, mean=4.0)])
+
+        result0 = exp1.merge(snapshot0)
+        result01 = result0.merge(snapshot1)
+
+        result1 = exp1.merge(snapshot1)
+        result10 = result1.merge(snapshot0)
+
         self.assertEqual(result01, result10)
+
         self.assertEqual(result01.sample_count, 2)
         self.assertEqual(result01.sample_rate, 1.0)
         self.assertEqual(result01.sample_base, 2.0)
@@ -76,21 +82,7 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(merge.metrics[0].standard_deviation, snapshot.metrics[0].standard_deviation)
         self.assertEqual(merge.metrics[0].sample_count,       snapshot.metrics[0].sample_count)
 
-    # @skip("rawr")
     def test_prune(self):
-        # snapshots = [
-        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
-        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
-        #     Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 48), metrics=[TestSnapshotMetric(field=0, mean=3.0), TestSnapshotMetric(field=1, mean=5.0)]),
-        # ]
-        # prune1 = [item for item in Snapshot.prune(reversed(sorted(snapshots, key=lambda snap: snap.timestamp)))]
-        # prune2 = [item for item in prune1]
-        # self.assertEqual(prune1, prune2)
-
-        # print()
-        # [print(s) for s in prune1]
-        # self.assertLess(len(prune1), len(snapshots))
-
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
@@ -111,60 +103,26 @@ class TestSnapshot(ORMTestCase):
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53,  0), metrics=[TestSnapshotMetric(field=0, mean=4.5), TestSnapshotMetric(field=1, mean=6.5)]),
         ]
         sorted_snapshots = list(reversed(sorted(snapshots, key=lambda snap: snap.timestamp)))
+
         pruned = [item for item in Snapshot.prune(sorted_snapshots)]
-        self.assertLess(len(pruned), len(snapshots))
+        self.assertLess(len(pruned), len(sorted_snapshots))
 
-        # # Assert that pruning the same data twice yields the same result
-        # print()
-        # print("Prune Twice")
-        # prune1 = [item for item in Snapshot.prune(sorted_snapshots)]
-        # self.assertEqual(pruned, prune1)
+        with self.subTest("Prune Twice"):
+            # Assert that pruning the same data twice yields the same result
+            prune1 = [item for item in Snapshot.prune(sorted_snapshots)]
+            self.assertEqual(pruned, prune1)
 
-        # # Assert that pruning the result of a prune yields the same result
-        # print()
-        # print("Prune Again")
-        # prune1 = [item for item in Snapshot.prune(pruned)]
-        # self.assertEqual(pruned, prune1)
+        with self.subTest("Prune Result of Prune"):
+            # Assert that pruning the result of a prune yields the same result
+            prune1 = [item for item in Snapshot.prune(pruned)]
+            self.assertEqual(pruned, prune1)
 
-        prune1 = []
-        for i in reversed(range(len(snapshots)-1)):
-            print()
-            print("Prune Incremental", i)
-            prune1 = [item for item in Snapshot.prune(
-                chain(
-                    [sorted_snapshots[i]],
-                    prune1
-                )
-            )]
-
-        return
-
-        # Assert that adding an element to the middle of the range yields the same result
-        # as pruning would if it had existed the entire time
-        for i in range(len(snapshots)-1):
-            print()
-            print("Prune Late Entry", i)
-            prune1 = [item for item in Snapshot.prune(chain(sorted_snapshots[0:i], sorted_snapshots[i+1:]))]
-            sorted_prune1_plus_element = list(reversed(sorted(chain(prune1, [sorted_snapshots[i]]), key=lambda snap: snap.timestamp)))
-            prune2 = [item for item in Snapshot.prune(sorted_prune1_plus_element)]
-            self.assertEqual(pruned, prune2)
-
-
-        return
-
-        print()
-        print("prune_0_6")
-        prune_0_6 = [item for item in Snapshot.prune(sorted_snapshots[:len(sorted_snapshots)//2])]
-        # [print(s) for s in prune_0_6]
-
-        print()
-        print("prune_7_13")
-        prune_7_13 = [item for item in Snapshot.prune(sorted_snapshots[len(sorted_snapshots)//2:])]
-        # [print(s) for s in prune_7_13]
-
-        print()
-        print("prune")
-        prune = [item for item in Snapshot.prune(chain(prune_0_6, prune_7_13))]
-        # [print(s) for s in prune]
-
-        # self.assertEqual(prune, prune1)
+        with self.subTest("Incremental Prune"):
+            prune1 = []
+            for i in reversed(range(len(sorted_snapshots))):
+                prune1 = [item for item in Snapshot.prune(
+                    chain(
+                        [sorted_snapshots[i]],
+                        prune1
+                    )
+                )]

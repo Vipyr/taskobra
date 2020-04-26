@@ -14,6 +14,9 @@ from taskobra.orm.relationships.snapshot_metric import snapshot_metric_table
 
 
 class Snapshot(ORMBase):
+
+    class UnmergableException(Exception): pass
+
     __tablename__ = "Snapshot"
     unique_id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
@@ -39,36 +42,49 @@ class Snapshot(ORMBase):
     def t_end(self):
         return self.timestamp
 
-    def covers(self, other: "Snapshot"):
+    def overlaps(self, other: "Snapshot"):
         return (
             self.timestamp and
             other.timestamp and
-            self.sample_exponent >= other.sample_exponent and
-            self.t_start < other.timestamp <= self.t_end
+            # self.sample_exponent > other.sample_exponent and
+            (
+                self.t_start  < other.timestamp <= self.t_end or
+                other.t_start < self.timestamp  <= other.t_end
+            )
         )
 
     def merge(self, other: "Snapshot"):
         """ Merges two Snapshots together.
+        associative
+        commutative
+        identity
         """
-        sample_count = self.sample_count + other.sample_count
-        sample_rate = (self.sample_rate * self.sample_count + other.sample_rate * other.sample_count) / sample_count
-        sample_base = (self.sample_base * self.sample_count + other.sample_base * other.sample_count) / sample_count
+        if self.overlaps(other):
+            sample_count = self.sample_count + other.sample_count
+            sample_rate = (self.sample_rate * self.sample_count + other.sample_rate * other.sample_count) / sample_count
+            sample_base = (self.sample_base * self.sample_count + other.sample_base * other.sample_count) / sample_count
 
-        # Create the new Snapshot
-        metrics_by_type = defaultdict(list)
-        [metrics_by_type[type(metric)].append(metric) for metric in self.metrics]
-        [metrics_by_type[type(metric)].append(metric) for metric in other.metrics]
-        pruned_metrics = []
-        [pruned_metrics.extend(metric_type.prune(metrics)) for metric_type, metrics in metrics_by_type.items()]
-        merged = Snapshot(
-            metrics=pruned_metrics,
-            timestamp=self.timestamp,
-            sample_count=sample_count,
-            sample_rate=sample_rate,
-            sample_base=sample_base,
-            sample_exponent=self.sample_exponent,
-        )
-        return merged
+            # Create the new Snapshot
+            metrics_by_type = defaultdict(list)
+            [metrics_by_type[type(metric)].append(metric) for metric in self.metrics]
+            [metrics_by_type[type(metric)].append(metric) for metric in other.metrics]
+            pruned_metrics = []
+            [pruned_metrics.extend(metric_type.prune(metrics)) for metric_type, metrics in metrics_by_type.items()]
+            merged = Snapshot(
+                metrics=pruned_metrics,
+                timestamp=max(self.timestamp, other.timestamp),
+                sample_count=sample_count,
+                sample_rate=sample_rate,
+                sample_base=sample_base,
+                sample_exponent=max(self.sample_exponent, other.sample_exponent),
+            )
+            return merged
+        else:
+            raise Snapshot.UnmergableException()
+
+    @staticmethod
+    def format_snap(snap):
+        return f"({snap.t_start.second:0>2}-{snap.t_end.second:0>2} {snap.sample_exponent} {snap.sample_count})"
 
     @classmethod
     def prune(cls, snapshots: Iterable["Snapshot"]):
@@ -81,19 +97,12 @@ class Snapshot(ORMBase):
 
         pruned = Snapshot(sample_count=0, sample_exponent=1)
 
-        print("Starting Prune:")
         for snapshot in chain(snapshots):
-            if pruned.covers(snapshot):
-                print("        Accumulating LR", snapshot)
+            try:
                 pruned = pruned.merge(snapshot)
-            elif snapshot.covers(pruned):
-                print("        Accumulating RL", snapshot)
-                pruned = snapshot.merge(pruned)
-            else:
+            except Snapshot.UnmergableException:
                 if pruned.sample_count:
-                    print("    Yielding", pruned)
                     yield pruned
-                # Start pruning the next range
                 pruned = Snapshot(
                     timestamp=snapshot.timestamp,
                     sample_count=snapshot.sample_count,
@@ -103,7 +112,6 @@ class Snapshot(ORMBase):
                     metrics=snapshot.metrics,
                 )
         if pruned.sample_count:
-            print("    Yielding", pruned)
             yield pruned
 
         return
