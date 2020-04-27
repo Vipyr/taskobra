@@ -17,6 +17,7 @@ class Metric(ORMBase):
     metric_type = Column(Enum(
         "TestMetricMetric",
         "TestSnapshotMetric",
+        "CpuPercent",
     ))
 
     __mapper_args__ = {
