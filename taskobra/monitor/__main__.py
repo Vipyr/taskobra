@@ -9,14 +9,14 @@ def parse_args():
 
 
 def create_snapshot(args):
-        snapshot = Snapshot()
-        # Call Each function, have each return a metric
-        print(f"Disk    : {psutil.disk_usage('/')}")
-        print(f"VMem    : {psutil.virtual_memory()}")
-        print(f"SwapMem : {psutil.swap_memory()}")
-        print(f"CPU     : {psutil.cpu_percent()}")
-        # snapshot = for each metric snapshot.add(metric)
-        yield snapshot
+    snapshot = Snapshot()
+    # Call Each function, have each return a metric
+    print(f"Disk    : {psutil.disk_usage('/')}")
+    print(f"VMem    : {psutil.virtual_memory()}")
+    print(f"SwapMem : {psutil.swap_memory()}")
+    print(f"CPU     : {psutil.cpu_percent()}")
+    # snapshot = for each metric snapshot.add(metric)
+    yield snapshot
 
 
 def main(args):
