@@ -151,26 +151,36 @@ be configured to automatically compress aging data.
 
 We use a logarithmic scale to calculate averages, combining multiple snapshots
 into one.  This time period can be represented by a base and an exponent.  Raw
-snapshot data generally is reported with an exponent of 0 and a Reporter
-configurable base. For example, the following snapshots are 1 second apart,
+snapshot data generally is reported with an exponent of 0, a Reporter configurable
+rate and base. For example, the following snapshots are 1 second apart,
 with base 3 pruning.
 
-| Snapshot |  User | System | Time | Base | Exponent |
-|----------|-------|--------|------|------|----------|
-|        0 |    42 |    314 | 1000 |    3 |        0 |
-|        1 |    42 |    314 | 1001 |    3 |        0 |
-|        2 |    42 |    314 | 1002 |    3 |        0 |
+| Snapshot |  User | System | Time | Rate | Base | Exponent |
+|----------|-------|--------|------|------|------|----------|
+|        0 |    42 |    314 | 1000 |    1 |    3 |        0 |
+|        1 |    42 |    314 | 1001 |    1 |    3 |        0 |
+|        2 |    42 |    314 | 1002 |    1 |    3 |        0 |
 
 After applying the pruning algorithm, the snapshot table would look
 something like this:
 
-| Snapshot |  User | System | Time | Base | Exponent |
-|----------|-------|--------|------|------|----------|
-|        3 |    42 |    314 | 1001 |    3 |        1 |
+| Snapshot |  User | System | Time | Rate | Base | Exponent |
+|----------|-------|--------|------|------|------|----------|
+|        3 |    42 |    314 | 1001 |    1 |    3 |        1 |
 
-Pruned snapshots cover <code>Base<sup>Exponent</sup></code> seconds,
+Pruned snapshots cover <code>Rate*Base<sup>Exponent</sup></code> seconds,
 with a Timestamp in the center of that range, and contain an average
 of all the snapshots they were generated from.
+
+### Properties of Pruning
+
+- Lazy Evaluation, only requiring two snapshots at a time to be in memory
+- Pruning the same data twice yields the same result
+- Pruning the result of a prune yields the same result
+- Two element merging satisfies associative, commutative, and identity properties
+- Expects sorted data in descending time order.
+  - This means data should be queried from the database
+    youngest to oldest
 
 ---
 
