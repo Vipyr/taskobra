@@ -1,7 +1,7 @@
 # Libraries
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 # Taskobra
-from .component import Component
+from taskobra.orm.components import Component
 
 
 class CPU(Component):

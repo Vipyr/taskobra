@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  taskobra:
+    build: .
+    image: taskobra
+    environment:
+      - DATABASE_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/taskobra
+    ports:
+      - "5000:9090"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:10
+    restart: always
+    environment: 
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=taskobra
+    volumes:
+      - flask-app-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+     
+volumes:
+  flask-app-db:
+    name: flask-app-db

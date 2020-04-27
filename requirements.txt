@@ -3,3 +3,4 @@ tox
 flask
 sqlalchemy
 psutil
+psycopg2
