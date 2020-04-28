@@ -9,8 +9,10 @@ from random import shuffle
 from sqlalchemy import Column, ForeignKey, Integer
 from typing import Collection
 from unittest import skip
+from unittest.mock import patch
 # Taskobra
 from taskobra.orm import get_engine, get_session, Metric, Snapshot
+from ..utils.snapshot_generator import snapshot_generator
 
 
 class TestSnapshotMetric(Metric):
@@ -83,6 +85,10 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(merge.metrics[0].sample_count,       snapshot.metrics[0].sample_count)
 
     def test_prune(self):
+        g = snapshot_generator()
+        for _ in range(3):
+            print(next(g))
+
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),

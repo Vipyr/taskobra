@@ -4,7 +4,7 @@ import logging
 import sys
 import os
 
-from taskobra.orm import get_engine, get_session
+from taskobra.orm import get_engine, get_session, Snapshot
 
 
 def parse_args():
@@ -24,7 +24,7 @@ def create_snapshot(args):
     print(f"SwapMem : {psutil.swap_memory()}")
     print(f"CPU     : {psutil.cpu_percent()}")
     # snapshot = for each metric snapshot.add(metric)
-    yield snapshot
+    return snapshot
 
 def create_database_engine(args):
     if args.database_uri:
@@ -32,8 +32,8 @@ def create_database_engine(args):
 
     if 'DATABASE_URI' in os.environ:
         return get_engine(os.environ.get('DATABASE_URI'))
-    
-    # If the fully resolved database URI is not provided, use the credentials and connect to localhost 
+
+    # If the fully resolved database URI is not provided, use the credentials and connect to localhost
     database_username = args.database_username if args.database_username else os.environ.get('POSTGRES_USER', None)
     database_password = args.database_password if args.database_password else os.environ.get('POSTGRES_PASSWORD', None)
     if (database_password is None) or (database_username is None):
@@ -49,7 +49,7 @@ def main(args):
         snapshot = create_snapshot(args)
         with get_session(bind=database_engine) as session:
             session.add(snapshot)
-            session.commit() 
+            session.commit()
 
 
 if __name__ == "__main__":
