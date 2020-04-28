@@ -1,5 +1,6 @@
-virtualenv
-tox
 flask
-sqlalchemy
 psutil
+psycopg2
+sqlalchemy
+tox
+virtualenv
