@@ -1,6 +1,0 @@
-flask
-psutil
-psycopg2
-sqlalchemy
-tox
-virtualenv
