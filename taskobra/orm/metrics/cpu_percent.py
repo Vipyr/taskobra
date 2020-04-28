@@ -1,3 +1,6 @@
+from collections import defaultdict
+from sqlalchemy import Column, ForeignKey, Integer
+from typing import Collection
 from taskobra.orm.metrics.metric import Metric
 
 
@@ -19,7 +22,7 @@ class CpuPercent(Metric):
                 yield metric
 
     def __repr__(self):
-        s = f"<Cpu{self.field}Percent({self.mean:.3}"
+        s = f"<Cpu{self.core_id}Percent({self.mean:.3}"
         if self.sample_count > 1:
             s += f" sd:{self.standard_deviation:.3} {self.sample_count})"
         s += ">"
