@@ -1,10 +1,11 @@
 import argparse
-import psutil
+import datetime
 import logging
-import sys
 import os
+import psutil
+import sys
 
-from taskobra.orm import get_engine, get_session, Snapshot
+from taskobra.orm import CpuPercent, get_engine, get_session, Snapshot
 
 
 def parse_args():
@@ -17,12 +18,12 @@ def parse_args():
 
 
 def create_snapshot(args):
-    snapshot = Snapshot()
+    snapshot = Snapshot(timestamp=datetime.datetime.now())
     # Call Each function, have each return a metric
-    print(f"Disk    : {psutil.disk_usage('/')}")
-    print(f"VMem    : {psutil.virtual_memory()}")
-    print(f"SwapMem : {psutil.swap_memory()}")
-    print(f"CPU     : {psutil.cpu_percent()}")
+    # print(f"Disk    : {psutil.disk_usage('/')}")
+    # print(f"VMem    : {psutil.virtual_memory()}")
+    # print(f"SwapMem : {psutil.swap_memory()}")
+    snapshot.metrics.append(CpuPercent(core_id=0, mean=psutil.cpu_percent()))
     # snapshot = for each metric snapshot.add(metric)
     return snapshot
 

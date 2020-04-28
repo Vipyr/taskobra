@@ -22,8 +22,8 @@ class CpuPercent(Metric):
                 yield metric
 
     def __repr__(self):
-        s = f"<Cpu{self.core_id}Percent({self.mean:.3}"
+        s = f"<Cpu{self.core_id}Percent({100*self.mean:.1f}"
         if self.sample_count > 1:
             s += f" sd:{self.standard_deviation:.3} {self.sample_count})"
-        s += ">"
+        s += ")>"
         return s

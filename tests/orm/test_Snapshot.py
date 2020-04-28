@@ -87,7 +87,9 @@ class TestSnapshot(ORMTestCase):
     def test_prune(self):
         g = snapshot_generator()
         for _ in range(3):
-            print(next(g))
+            snapshot = next(g)
+            print(snapshot)
+            [print(f"    {metric}") for metric in snapshot.metrics]
 
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
