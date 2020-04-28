@@ -17,7 +17,8 @@ class Component(ORMBase):
         "Memory",
         "OperatingSystem",
         "NetworkAdapter",
-        "Storage"
+        "Storage",
+        name="ComponentType"
     ))
 
 
