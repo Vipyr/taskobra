@@ -46,7 +46,6 @@ class Snapshot(ORMBase):
         return (
             self.timestamp and
             other.timestamp and
-            # self.sample_exponent > other.sample_exponent and
             (
                 self.t_start  < other.timestamp <= self.t_end or
                 other.t_start < self.timestamp  <= other.t_end
@@ -98,7 +97,6 @@ class Snapshot(ORMBase):
         pruned = Snapshot(sample_count=0, sample_exponent=1)
 
         for snapshot in snapshots:
-            # [metric for metric in snapshot.metrics]
             try:
                 pruned = pruned.merge(snapshot)
                 yield snapshot, None
