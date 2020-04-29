@@ -61,3 +61,6 @@ def metrics_storage():
     ]
     return jsonify(percent_list)
 
+@blueprint.route('/prune')
+def prune():
+    return jsonify({})
