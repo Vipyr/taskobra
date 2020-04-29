@@ -1,10 +1,11 @@
 from collections import namedtuple
+import datetime
 from unittest.mock import MagicMock, patch
 from random import random, randint
 import taskobra.monitor.__main__
 
 
-def snapshot_generator():
+def snapshot_generator(max_snaphots=None):
     class Percent(float):
         def __repr__(self):
             return f"{self * 100:0.1f}"
@@ -51,5 +52,17 @@ def snapshot_generator():
         mock_psutil.virtual_memory.side_effect = mock_virtual_memory
         mock_psutil.swap_memory.side_effect = mock_swap_memory
         mock_psutil.cpu_percent.side_effect = mock_cpu_percent
-        while True:
-            yield taskobra.monitor.__main__.create_snapshot([])
+
+        def mock_now(start_time):
+            while True:
+                start_time -= datetime.timedelta(seconds=randint(1, 5) + (-0.5 + random()))
+                yield start_time
+
+        now_generator = mock_now(datetime.datetime.now())
+        with patch("taskobra.monitor.__main__.datetime.datetime") as mock_datetime_datetime:
+            mock_datetime_datetime.now.side_effect = lambda: next(now_generator)
+
+            count = 0
+            while not max_snaphots or count < max_snaphots:
+                count += 1
+                yield taskobra.monitor.__main__.create_snapshot([])

@@ -4,9 +4,11 @@ from .ORMTestCase import ORMTestCase
 from collections import defaultdict
 from datetime import datetime
 from itertools import chain
+import logging
 from math import log
-from random import shuffle
+import random
 from sqlalchemy import Column, ForeignKey, Integer
+import sys
 from typing import Collection
 from unittest import skip
 from unittest.mock import patch
@@ -85,12 +87,6 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(merge.metrics[0].sample_count,       snapshot.metrics[0].sample_count)
 
     def test_prune(self):
-        g = snapshot_generator()
-        for _ in range(3):
-            snapshot = next(g)
-            print(snapshot)
-            [print(f"    {metric}") for metric in snapshot.metrics]
-
         snapshots = [
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 53), metrics=[TestSnapshotMetric(field=0, mean=2.0), TestSnapshotMetric(field=1, mean=4.0)], sample_rate=2.0),
             Snapshot(timestamp=datetime(2020, 3, 9, 9, 53, 50), metrics=[TestSnapshotMetric(field=0, mean=2.5), TestSnapshotMetric(field=1, mean=4.5)]),
@@ -134,3 +130,12 @@ class TestSnapshot(ORMTestCase):
                         prune1
                     )
                 )]
+
+    def test_prune_random(self):
+        seed = random.randint(0, 0xFFFFFFFFFFFFFFFF)
+        print(f"(test_prune_random seed=0x{seed:0>16X}) ", end="")
+        sys.stdout.flush()
+        random.seed(seed)
+        snapshot_count = 20000
+        pruned = Snapshot.prune(snapshot_generator(snapshot_count))
+        self.assertEqual(snapshot_count, sum(snapshot.sample_count for snapshot in pruned))
