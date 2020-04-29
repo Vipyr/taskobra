@@ -4,7 +4,7 @@ import random
 import statistics
 
 from taskobra.orm import *
-from taskobra.web import db
+from taskobra.web.ext import db
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 

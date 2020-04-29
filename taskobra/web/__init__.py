@@ -1,14 +1,13 @@
 import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from taskobra.orm import *
+from taskobra.web.ext import db
 from taskobra.web.views import api, ui
 
-db = SQLAlchemy() 
 
 def create_app():
     """
@@ -31,6 +30,8 @@ def create_app():
     # Set Up Database Bindings
     db.make_declarative_base(ORMBase)
     db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
     return app
 
