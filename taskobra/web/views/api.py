@@ -63,4 +63,5 @@ def metrics_storage():
 
 @blueprint.route('/prune')
 def prune():
+    db.session.query(System)
     return jsonify({})

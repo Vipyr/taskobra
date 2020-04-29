@@ -9,6 +9,7 @@ setup(
     ],
     install_requires = [
         "flask",
+        "flask_sqlalchemy",
         "psutil",
         "psycopg2",
         "sqlalchemy",

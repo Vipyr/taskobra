@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from taskobra.orm import *
 from taskobra.web.views import api, ui
 
+db = SQLAlchemy() 
 
 def create_app():
     """
@@ -19,19 +21,16 @@ def create_app():
             static_folder='static')         # Root Path for url_for('static')
 
     # Load config from ENV
-    app.config['DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
-    # TODO: OAuth Key
-    # TODO: ???
-    print(f" * Using Database URI {app.config['DATABASE_URI']}")
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     # Bind Route Blueprints Packages to the base App
     app.register_blueprint(api.blueprint)
     app.register_blueprint(ui.blueprint)
 
     # Set Up Database Bindings
-    engine = create_engine(app.config['DATABASE_URI'])
-    db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-    ORMBase.query = db_session.query_property()
-    ORMBase.metadata.create_all(bind=engine)
+    db.make_declarative_base(ORMBase)
+    db.init_app(app)
 
     return app
 
