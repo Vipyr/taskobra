@@ -6,7 +6,7 @@ import subprocess
 
 def create_system(args, database_engine):
     system = System(name=platform.node())
-    cpuinfo = cpuinfo.get_cpu_info()
+    cpu_info = cpuinfo.get_cpu_info()
 
     system.add_component(OperatingSystem(
         name=platform.system(),
@@ -14,22 +14,21 @@ def create_system(args, database_engine):
     ))
 
     system.add_component(CPU(
-        manufacturer=cpuinfo.get('vendor_id', ''),
-        model=cpuinfo.get('brand', ''),
-        isa=cpuinfo.get('arch', ''),
-        core_count=cpuinfo.get('count', 1),
+        manufacturer=cpu_info.get('vendor_id', ''),
+        model=cpu_info.get('brand', ''),
+        isa=cpu_info.get('arch', ''),
+        core_count=cpu_info.get('count', 1),
         threads_per_core=1,
-        nominal_frequency=(cpuinfo.get('hz_actual_raw') / 1000000000),
+        nominal_frequency=(cpu_info.get('hz_actual_raw')[0] / 1000000000),
     ))
 
     with get_session(bind=database_engine) as session:
         current_system = session.query(System).filter(
             System.name == platform.node(),
         ).first()
-        if current_system is not None:
-            session.delete(current_system)
-        session.add(system)
-        session.commit()
+        if current_system is None:
+            session.add(system)
+            session.commit()
         
     #gpu = GPU(
     #    manufacturer="NVIDIA",

@@ -15,9 +15,9 @@ class Metric(ORMBase):
     mean = Column(Float)
     variance = Column(Float, default=0.0)
     metric_type = Column(Enum(
+        "CpuPercent",
         "TestMetricMetric",
         "TestSnapshotMetric",
-        "CpuPercent",
         name="MetricType"
     ))
 
