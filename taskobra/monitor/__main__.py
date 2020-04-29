@@ -32,6 +32,7 @@ def create_database_engine(args):
         return get_engine(args.database_uri)
 
     if 'DATABASE_URI' in os.environ:
+        print(f" * Connecting to database {os.environ.get('DATABASE_URI')}")
         return get_engine(os.environ.get('DATABASE_URI'))
 
     # If the fully resolved database URI is not provided, use the credentials and connect to localhost
@@ -42,6 +43,7 @@ def create_database_engine(args):
         sys.exit(1)
     else:
         database_uri = f"postgresql://{database_username}:{database_password}@127.0.0.1:5432/taskobra"
+        print(f" * Connecting to database {database_uri}")
         return get_engine(database_uri)
 
 def main(args):

@@ -1,11 +1,11 @@
-import os 
+import os
 from sqlalchemy.orm import sessionmaker
 from taskobra.orm import get_engine, ORMBase
 
 
 class TestDatabase(object):
     def __init__(self, database_uri, data_generator):
-        # Initialize the databse 
+        # Initialize the databse
         self.database_uri = database_uri
         self.data_generator = data_generator
         self.engine = get_engine(self.database_uri)
@@ -13,8 +13,8 @@ class TestDatabase(object):
         ORMBase.metadata.create_all(self.session.bind)
 
     def __enter__(self):
-        # Generate and commit the test data 
-        for db_object in self.data_generator():
+        # Generate and commit the test data
+        for db_object in self.data_generator:
             self.session.add(db_object)
         self.session.commit()
 

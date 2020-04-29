@@ -1,7 +1,8 @@
 from taskobra.orm import Component, Storage, System, CPU, GPU, Memory, OperatingSystem
 
-def fake_systems_generator():
-    for index in range(0,10):
+def fake_systems_generator(max_systems=None):
+    count = 0
+    while not max_systems or count < max_systems:
         cpu = CPU(
             manufacturer="AMD",
             model="Ryzen 3800X",
@@ -43,7 +44,7 @@ def fake_systems_generator():
             developer="Microsoft",
             name="Windows 10",
         )
-        system = System(name=f"System {index}")
+        system = System(name=f"System {count}")
         system.add_component(cpu)
         system.add_component(gpu)
         system.add_component(memory)
@@ -51,3 +52,4 @@ def fake_systems_generator():
         system.add_component(storage)
         system.add_component(os)
         yield system
+        count += 1
