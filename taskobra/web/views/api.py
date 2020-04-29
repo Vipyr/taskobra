@@ -9,11 +9,13 @@ blueprint = Blueprint('api', __name__, url_prefix='/api')
 @blueprint.route('/')
 def base():
     return jsonify({})
-    
+
 @blueprint.route('/systems')
 def systems():
     system_list = [
-        {'hostname': system.name, 'cores' : '12', 'memory': '16GB', 'storage': '500GB' }
+        {'hostname': system.name, 
+        'cores' : sum([component.core_count for _, component in system.components if isinstance(component, CPU)]),
+        'memory': '16GB', 'storage': '500GB' }
         for system in System.query.all()
     ]
     return jsonify(system_list)
@@ -45,3 +47,4 @@ def metrics_storage():
         [idx, random.uniform(0, 100)] for idx in range(0, 1000)
     ]
     return jsonify(percent_list)
+
