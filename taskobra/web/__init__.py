@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from taskobra.orm import *
 from taskobra.web.views import api, ui
+from taskobra.web.database import db_session, init_db
 
 
 def create_app():
@@ -27,11 +28,11 @@ def create_app():
     app.register_blueprint(api.blueprint)
     app.register_blueprint(ui.blueprint)
 
-    # Set Up Database Bindings
-    engine = create_engine(app.config['DATABASE_URI'])
-    db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-    ORMBase.query = db_session.query_property()
-    ORMBase.metadata.create_all(bind=engine)
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        db_session.remove()
+
+    init_db()
 
     return app
 

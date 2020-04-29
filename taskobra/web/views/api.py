@@ -4,6 +4,7 @@ import random
 import statistics
 
 from taskobra.orm import *
+from taskobra.web.database import db_session
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 
@@ -63,11 +64,11 @@ def metrics_storage():
 
 @blueprint.route('/prune')
 def prune():
-    session = None
-    for old, new in Snapshot.prune(session.query(Snapshot)):
+    for old, new in Snapshot.prune(db_session.query(Snapshot)):
         if old:
-            session.delete(old)
+            db_session.delete(old)
         if new:
-            session.add(new)
-        session.commit()
+            db_session.add(new)
+        if old or new:
+            db_session.commit()
     return jsonify({})
