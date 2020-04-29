@@ -142,9 +142,13 @@ class TestSnapshot(ORMTestCase):
         self.assertEqual(snapshot_count, sum(snapshot.sample_count for _, snapshot in pruned if snapshot))
 
     def test_prune_db(self):
-        snapshot_count = 40
+        snapshot_count = 50
         snapshots = [snapshot for snapshot in snapshot_generator(snapshot_count)]
-        pruned = [item for _, item in Snapshot.prune(snapshots) if item]
+        original = []
+        pruned = []
+        for old, new in Snapshot.prune(snapshots):
+            if old: original.append(old)
+            if new: pruned.append(new)
         with TestDatabase("sqlite:///:memory:", snapshots) as session:
             for old, new in Snapshot.prune(session.query(Snapshot)):
                 if old:
@@ -153,5 +157,6 @@ class TestSnapshot(ORMTestCase):
                     session.add(new)
                 session.commit()
             queried = list(session.query(Snapshot))
+            self.assertEqual(snapshots, original)
             self.assertEqual(queried, pruned)
             self.assertEqual(snapshot_count, sum(snapshot.sample_count for snapshot in queried if snapshot))
