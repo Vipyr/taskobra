@@ -12,9 +12,9 @@ function render_systems(system_list) {
     var instance = template.content.cloneNode(true);
     instance.querySelector(".hostlist-checkbox").value = host.hostname;
     instance.querySelector(".hostlist-name").textContent = host.hostname;
-    instance.querySelector(".hostlist-status").textContent = host.status;
-    instance.querySelector(".hostlist-uptime").textContent = host.uptime;
-    instance.querySelector(".hostlist-misc").textContent = host.misc;
+    instance.querySelector(".hostlist-cores").textContent = host.cores;
+    instance.querySelector(".hostlist-memory").textContent = host.memory;
+    instance.querySelector(".hostlist-storage").textContent = host.storage;
     instance.querySelector("tr").addEventListener("click", function(event){
       var hostlist_checkbox = event.currentTarget.querySelector(".hostlist-checkbox");
       hostlist_checkbox.checked = !hostlist_checkbox.checked;
@@ -31,29 +31,26 @@ function render_systems(system_list) {
       https://developers.google.com/chart/interactive/docs/quick_start
 */
 function render_charts() {
-  // TODO: Fill this in with real charts
-  var data = google.visualization.arrayToDataTable([
-    ['Year', 'Sales', 'Expenses'],
-    ['2004',  1000,      400],
-    ['2005',  1170,      460],
-    ['2006',  660,       1120],
-    ['2007',  1030,      540]
-  ]);
-  
   document.querySelectorAll(".taskobra-chart").forEach(chart => {
+    if ($( chart ).parent('.active').length == 0) { return }
+    var metric_type = chart.getAttribute('data-metric-type')
+    $.ajax({url: "/api/metrics/" + metric_type, chart: chart, success: function(chart_data) {
+      var labels = [ [ {label: 'Time', id: 'time'}, {label: 'Utilization', id: 'utilization', type: 'number'} ] ];
+      var data = google.visualization.arrayToDataTable(
+        labels.concat(chart_data)
+      );
 
-    var options = {
-      title: 'Company Performance',
-      curveType: 'function',
-      width: 1200, height: 500,         // TODO: This will need to be reflexive obviously 
-      legend: { position: 'bottom' }
-    };
+      var options = {
+        curveType: 'function',
+        width: $(window).width()*0.80, 
+        height: $(window).height()*0.50, 
+        chartArea: {'width': '90%', 'height': '80%'},
+        legend: {position: 'none'}
+      };
 
-    console.log(chart);
-    var chart = new google.visualization.LineChart(chart);
-
-    chart.draw(data, options);
-
+      var chart = new google.visualization.LineChart(this.chart);
+      chart.draw(data, options);
+    }})
   });
 }
 
@@ -71,4 +68,13 @@ window.onload = (event) => {
   // Load the Visualization API and the corechart package.
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(render_charts);
+  setInterval(render_charts, 1000);
 };
+
+/* 
+    On Ready Callback
+      After the load finishes
+*/
+$( document ).ready(function () {
+  $('#v-pills-cpu-tab').tab('show')
+})

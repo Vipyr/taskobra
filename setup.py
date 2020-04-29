@@ -12,5 +12,6 @@ setup(
         "psutil",
         "psycopg2",
         "sqlalchemy",
+        "py-cpuinfo",
     ],
 )

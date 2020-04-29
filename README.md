@@ -26,3 +26,10 @@ Finally, start the monitor process:
 python3 -m taskobra.monitor 
 ```
 
+## Cleaning Up 
+
+```sh
+docker-compose stop
+docker-compose rm 
+docker volume rm flask-app-db
+```

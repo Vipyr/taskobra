@@ -1,7 +1,10 @@
 from flask import Blueprint, jsonify
 import json
+import random
+import statistics
 
 from taskobra.orm import *
+from taskobra.web.database import db_session
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 
@@ -10,14 +13,62 @@ def base():
     return jsonify({})
 
 @blueprint.route('/systems')
-def hostnames():
-    systems = [
-                                  # Switch Status/Uptime/Misc -> Num Cores / Memory Size / Storage Cap
+def systems():
+    system_list = [
         {'hostname': system.name,
-        'Cores' : sum([component.core_count for _, component in system.components if isinstance(component, CPU)]),
-        'uptime': '00:00:00',
-        'misc': '' }
+        'cores' : sum([component.core_count for _, component in system.components if isinstance(component, CPU)]),
+        'memory': '16GB', 'storage': '500GB' }
         for system in System.query.all()
     ]
-    return jsonify(systems)
+    return jsonify(system_list)
 
+@blueprint.route('/metrics/cpu')
+def metrics_cpu():
+    # [ [x, y], [x2, y2] ... ]
+    #CPUPercent.join(Systems).query(system.system_name == "")
+    percent_list = []
+    snapshots = Snapshot.query.all()
+    for snapshot in snapshots:
+        cpu_percent = []
+        for metric in snapshot.metrics:
+            if isinstance(metric, CpuPercent):
+                cpu_percent.append(metric.mean)
+        #total_cpu = statistics.mean(
+        #    metric.mean for metric in snapshot.metrics if isinstance(metric, CpuPercent)
+        #)
+        total_cpu = statistics.mean(cpu_percent)
+        percent_list.append([snapshot.timestamp, total_cpu])
+
+    return jsonify(percent_list)
+
+@blueprint.route('/metrics/gpu')
+def metrics_gpu():
+    percent_list = [
+        [idx, random.uniform(0, 100)] for idx in range(0, 1000)
+    ]
+    return jsonify(percent_list)
+
+@blueprint.route('/metrics/memory')
+def metrics_memory():
+    percent_list = [
+        [idx, random.uniform(0, 100)] for idx in range(0, 1000)
+    ]
+    return jsonify(percent_list)
+
+@blueprint.route('/metrics/storage')
+def metrics_storage():
+    percent_list = [
+        [idx, random.uniform(0, 100)] for idx in range(0, 1000)
+    ]
+    return jsonify(percent_list)
+
+@blueprint.route('/prune')
+def prune():
+    for old, new in Snapshot.prune(db_session.query(Snapshot)):
+        if old:
+            db_session.delete(old)
+        if new:
+            db_session.add(new)
+        if old or new:
+            db_session.commit()
+    return jsonify({})

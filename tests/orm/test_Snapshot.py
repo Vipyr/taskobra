@@ -15,6 +15,7 @@ from unittest.mock import patch
 # Taskobra
 from taskobra.orm import get_engine, get_session, Metric, Snapshot
 from ..utils.snapshot_generator import snapshot_generator
+from ..utils.TestDatabase import TestDatabase
 
 
 class TestSnapshotMetric(Metric):
@@ -108,34 +109,54 @@ class TestSnapshot(ORMTestCase):
         ]
         sorted_snapshots = list(reversed(sorted(snapshots, key=lambda snap: snap.timestamp)))
 
-        pruned = [item for item in Snapshot.prune(sorted_snapshots)]
+        pruned = [item for _, item in Snapshot.prune(sorted_snapshots) if item]
         self.assertLess(len(pruned), len(sorted_snapshots))
 
         with self.subTest("Prune Twice"):
             # Assert that pruning the same data twice yields the same result
-            prune1 = [item for item in Snapshot.prune(sorted_snapshots)]
+            prune1 = [item for _, item in Snapshot.prune(sorted_snapshots) if item]
             self.assertEqual(pruned, prune1)
 
         with self.subTest("Prune Result of Prune"):
             # Assert that pruning the result of a prune yields the same result
-            prune1 = [item for item in Snapshot.prune(pruned)]
+            prune1 = [item for _, item in Snapshot.prune(pruned) if item]
             self.assertEqual(pruned, prune1)
 
         with self.subTest("Incremental Prune"):
             prune1 = []
             for i in reversed(range(len(sorted_snapshots))):
-                prune1 = [item for item in Snapshot.prune(
+                prune1 = [item for _, item in Snapshot.prune(
                     chain(
                         [sorted_snapshots[i]],
                         prune1
                     )
-                )]
+                ) if item]
 
     def test_prune_random(self):
         seed = random.randint(0, 0xFFFFFFFFFFFFFFFF)
         print(f"(test_prune_random seed=0x{seed:0>16X}) ", end="")
         sys.stdout.flush()
         random.seed(seed)
-        snapshot_count = 20000
+        snapshot_count = 2000
         pruned = Snapshot.prune(snapshot_generator(snapshot_count))
-        self.assertEqual(snapshot_count, sum(snapshot.sample_count for snapshot in pruned))
+        self.assertEqual(snapshot_count, sum(snapshot.sample_count for _, snapshot in pruned if snapshot))
+
+    def test_prune_db(self):
+        snapshot_count = 50
+        snapshots = [snapshot for snapshot in snapshot_generator(snapshot_count)]
+        original = []
+        pruned = []
+        for old, new in Snapshot.prune(snapshots):
+            if old: original.append(old)
+            if new: pruned.append(new)
+        with TestDatabase("sqlite:///:memory:", snapshots) as session:
+            for old, new in Snapshot.prune(session.query(Snapshot)):
+                if old:
+                    session.delete(old)
+                if new:
+                    session.add(new)
+                session.commit()
+            queried = list(session.query(Snapshot))
+            self.assertEqual(snapshots, original)
+            self.assertEqual(queried, pruned)
+            self.assertEqual(snapshot_count, sum(snapshot.sample_count for snapshot in queried if snapshot))
