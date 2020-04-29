@@ -13,7 +13,6 @@
     -->
     <div class="col-md-2">
       <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        <a class="nav-pill nav-link active" id="v-pills-overall-tab" data-toggle="pill" href="#v-pills-overall" role="tab" aria-controls="v-pills-overall" aria-selected="true">Overall</a>
         <a class="nav-pill nav-link" id="v-pills-cpu-tab" data-toggle="pill" href="#v-pills-cpu" role="tab" aria-controls="v-pills-cpu" aria-selected="false">CPU</a>
         <a class="nav-pill nav-link" id="v-pills-gpu-tab" data-toggle="pill" href="#v-pills-gpu" role="tab" aria-controls="v-pills-gpu" aria-selected="false">GPU</a>
         <a class="nav-pill nav-link" id="v-pills-memory-tab" data-toggle="pill" href="#v-pills-memory" role="tab" aria-controls="v-pills-memory" aria-selected="false">Memory</a>
@@ -29,29 +28,28 @@
       -->
       <div class="tab-content" id="v-pills-tabContent">
 
-        <!-- Overall Chart -->
-        <div class="tab-pane fade show active" id="v-pills-overall" role="tabpanel" aria-labelledby="v-pills-overall-tab">
-          <div class="taskobra-chart" id="taskobra-overall-chart"></div>
-        </div>
-
         <!-- CPU Chart -->
         <div class="tab-pane fade" id="v-pills-cpu" role="tabpanel" aria-labelledby="v-pills-cpu-tab">
-          <div class="taskobra-chart" id="taskobra-cpu-chart"></div>
+          <h2> CPU Utilization </h2>
+          <div class="taskobra-chart" id="taskobra-cpu-chart" data-metric-type="cpu"></div>
         </div>
 
         <!-- GPU Chart -->
         <div class="tab-pane fade" id="v-pills-gpu" role="tabpanel" aria-labelledby="v-pills-gpu-tab">
-          <div class="taskobra-chart" id="taskobra-gpu-chart"></div>
+          <h2> GPU Utilization </h2>
+          <div class="taskobra-chart" id="taskobra-gpu-chart" data-metric-type="gpu"></div>
         </div>
 
         <!-- Memory Chart -->
         <div class="tab-pane fade" id="v-pills-memory" role="tabpanel" aria-labelledby="v-pills-memory-tab">
-          <div class="taskobra-chart" id="taskobra-memory-chart"></div>
+          <h2> Memory Utilization </h2>
+          <div class="taskobra-chart" id="taskobra-memory-chart" data-metric-type="memory"></div>
         </div>
 
         <!-- Storage Chart -->
         <div class="tab-pane fade" id="v-pills-storage" role="tabpanel" aria-labelledby="v-pills-storage-tab">
-          <div class="taskobra-chart" id="taskobra-stoage-chart"></div>
+          <h2> Storage Utilization </h2>
+          <div class="taskobra-chart" id="taskobra-stoage-chart" data-metric-type="storage"></div>
         </div>
 
       </div>
