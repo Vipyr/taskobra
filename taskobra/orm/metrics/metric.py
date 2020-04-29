@@ -18,6 +18,7 @@ class Metric(ORMBase):
         "TestMetricMetric",
         "TestSnapshotMetric",
         "CpuPercent",
+        name="MetricType"
     ))
 
     __mapper_args__ = {

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 import json
 import random
+import statistics
 
 from taskobra.orm import *
 
@@ -22,9 +23,21 @@ def systems():
     
 @blueprint.route('/metrics/cpu')
 def metrics_cpu():
-    percent_list = [
-        [idx, random.uniform(0, 100)] for idx in range(0, 1000)
-    ]
+    # [ [x, y], [x2, y2] ... ]
+    #CPUPercent.join(Systems).query(system.system_name == "")
+    percent_list = []
+    snapshots = Snapshot.query.all() 
+    for snapshot in snapshots:
+        cpu_percent = []
+        for metric in snapshot.metrics:
+            if isinstance(metric, CpuPercent):
+                cpu_percent.append(metric.mean)
+        #total_cpu = statistics.mean(
+        #    metric.mean for metric in snapshot.metrics if isinstance(metric, CpuPercent)
+        #)
+        total_cpu = statistics.mean(cpu_percent)
+        percent_list.append([snapshot.timestamp, total_cpu])
+
     return jsonify(percent_list)
 
 @blueprint.route('/metrics/gpu')

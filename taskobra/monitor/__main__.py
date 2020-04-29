@@ -4,16 +4,20 @@ import logging
 import os
 import psutil
 import sys
+import time
+import platform 
 
 from taskobra.orm import CpuPercent, get_engine, get_session, Snapshot
+from taskobra.monitor import system_info
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v",  "--verbose",           action="store_true", help="Increase output verbosity")
-    parser.add_argument("-d",  "--database-uri",      nargs="?",           help="Database URI to connect to, defaults to localhost or using the DATABASE_URI environment variable")
-    parser.add_argument("-pw", "--database-password", nargs="?",           help="Database password to use in the URI, not used if the URI is specified")
-    parser.add_argument("-u",  "--database-username", nargs="?",           help="Database username to use in the URI, not used if the URI is specified")
+    parser.add_argument("-v",  "--verbose",           action="store_true",  help="Increase output verbosity")
+    parser.add_argument("-s",  "--sample-rate",       nargs="?", default=2.0, help="Database URI to connect to, defaults to localhost or using the DATABASE_URI environment variable")
+    parser.add_argument("-d",  "--database-uri",      nargs="?",            help="Database URI to connect to, defaults to localhost or using the DATABASE_URI environment variable")
+    parser.add_argument("-pw", "--database-password", nargs="?",            help="Database password to use in the URI, not used if the URI is specified")
+    parser.add_argument("-u",  "--database-username", nargs="?",            help="Database username to use in the URI, not used if the URI is specified")
     return parser.parse_args()
 
 
@@ -46,11 +50,16 @@ def create_database_engine(args):
         print(f" * Connecting to database {database_uri}")
         return get_engine(database_uri)
 
+
 def main(args):
     database_engine = create_database_engine(args)
+    system_info.create_system(args, database_engine)
     while True:
+        time.sleep(args.sample_rate)
         snapshot = create_snapshot(args)
+        snapshot.sample_rate = args.sample_rate
         with get_session(bind=database_engine) as session:
+            print(snapshot)
             session.add(snapshot)
             session.commit()
 
