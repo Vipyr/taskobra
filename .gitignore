@@ -130,3 +130,6 @@ dmypy.json
 
 # VSCode
 .vscode/
+
+# Taskobra Artifacts
+taskobra.sqlite.db

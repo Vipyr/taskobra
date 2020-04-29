@@ -11,18 +11,18 @@ from taskobra.web.views import api, ui
 def create_app():
     """
     Taskobra Web Application Factory
-        Constructs Flask WSGI Application 
+        Constructs Flask WSGI Application
     return -- Flask()
     """
-    app = Flask(__name__, 
-            template_folder='static/html',  # Root path for render_template() 
+    app = Flask(__name__,
+            template_folder='static/html',  # Root path for render_template()
             static_folder='static')         # Root Path for url_for('static')
 
-    # Load config from ENV 
+    # Load config from ENV
     app.config['DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
     # TODO: OAuth Key
     # TODO: ???
-    
+    print(f" * Using Database URI {app.config['DATABASE_URI']}")
     # Bind Route Blueprints Packages to the base App
     app.register_blueprint(api.blueprint)
     app.register_blueprint(ui.blueprint)
