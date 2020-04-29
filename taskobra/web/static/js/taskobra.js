@@ -12,9 +12,9 @@ function render_systems(system_list) {
     var instance = template.content.cloneNode(true);
     instance.querySelector(".hostlist-checkbox").value = host.hostname;
     instance.querySelector(".hostlist-name").textContent = host.hostname;
-    instance.querySelector(".hostlist-status").textContent = host.status;
-    instance.querySelector(".hostlist-uptime").textContent = host.uptime;
-    instance.querySelector(".hostlist-misc").textContent = host.misc;
+    instance.querySelector(".hostlist-cores").textContent = host.cores;
+    instance.querySelector(".hostlist-memory").textContent = host.memory;
+    instance.querySelector(".hostlist-storage").textContent = host.storage;
     instance.querySelector("tr").addEventListener("click", function(event){
       var hostlist_checkbox = event.currentTarget.querySelector(".hostlist-checkbox");
       hostlist_checkbox.checked = !hostlist_checkbox.checked;

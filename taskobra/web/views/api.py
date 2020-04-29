@@ -13,7 +13,7 @@ def base():
 @blueprint.route('/systems')
 def systems():
     system_list = [
-        {'hostname': system.name, 'status' : 'Good', 'uptime': '00:00:00', 'misc': '' }
+        {'hostname': system.name, 'cores' : '12', 'memory': '16GB', 'storage': '500GB' }
         for system in System.query.all()
     ]
     return jsonify(system_list)
