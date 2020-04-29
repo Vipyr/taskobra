@@ -100,9 +100,12 @@ class Snapshot(ORMBase):
         for snapshot in snapshots:
             try:
                 pruned = pruned.merge(snapshot)
+                yield snapshot, None
             except Snapshot.UnmergableException:
                 if pruned.sample_count:
-                    yield pruned
+                    yield snapshot, pruned
+                else:
+                    yield snapshot, None
                 pruned = Snapshot(
                     timestamp=snapshot.timestamp,
                     sample_count=snapshot.sample_count,
@@ -112,79 +115,7 @@ class Snapshot(ORMBase):
                     metrics=snapshot.metrics,
                 )
         if pruned.sample_count:
-            yield pruned
-
-        return
-
-        snap0 = next(snapshots)
-        snapshots = reversed(
-            sorted(
-                snapshots,
-                key=lambda snapshot: snapshot.timestamp,
-            ),
-        )
-        prunes = []
-        snaps = []
-        sample_exponent = 1.0
-        sample_rate = None
-        sample_base = None
-        dt = timedelta(seconds=snap0.sample_dt / 2)
-        time_slice = (snap0.timestamp - dt, snap0.timestamp + dt)
-        for snapshot in snapshots:
-            if time_slice and time_slice[0] > snapshot.timestamp >= time_slice[1]:
-                sample_rate = (sample_rate * len(snaps) + snapshot.sample_rate) / (len(snaps) + 1)
-                sample_base = (sample_base * len(snaps) + snapshot.sample_base) / (len(snaps) + 1)
-                time_slice = (time_slice[0], time_slice[0] - timedelta(seconds=sample_rate * sample_base ** sample_exponent))
-            else:
-                if snaps:
-                    metrics_by_type = defaultdict(list)
-                    [
-                        [
-                            metrics_by_type[type(metric)].append(metric)
-                            for metric in snap.metrics
-                        ]
-                        for snap in snaps
-                    ]
-                    pruned_metrics = []
-                    [pruned_metrics.extend(metric_type.prune(metrics))
-                        for metric_type, metrics in metrics_by_type.items()]
-                    prunes.append(
-                        cls(
-                            timestamp=(time_slice[0] + ((time_slice[1] - time_slice[0]) / 2)),
-                            metrics=pruned_metrics,
-                            sample_rate=sample_rate,
-                            sample_base=sample_base,
-                            sample_exponent=sample_exponent,
-                        )
-                    )
-                    snaps = []
-                sample_exponent += 1
-                sample_rate = snapshot.sample_rate
-                sample_base = snapshot.sample_base
-                time_slice = (time_slice[1], time_slice[1] - timedelta(seconds=sample_rate * sample_base ** sample_exponent))
-            snaps.append(snapshot)
-
-        metrics_by_type = defaultdict(list)
-        [
-            [
-                metrics_by_type[type(metric)].append(metric)
-                for metric in snapshot.metrics
-            ]
-            for snapshot in snaps
-        ]
-        pruned_metrics = []
-        [pruned_metrics.extend(metric_type.prune(metric))
-            for metric_type, metric in metrics_by_type.items()]
-        prunes.append(
-            cls(
-                timestamp=(time_slice[0] + ((time_slice[1] - time_slice[0]) / 2)),
-                metrics=pruned_metrics,
-                sample_rate=sample_rate,
-                sample_base=sample_base,
-                sample_exponent=sample_exponent,
-            )
-        )
-        return prunes
+            yield None, pruned
 
     def __repr__(self):
         total_metrics = sum(metric.sample_count for metric in self.metrics)
