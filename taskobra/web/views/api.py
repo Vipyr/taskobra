@@ -4,6 +4,7 @@ import random
 import statistics
 
 from taskobra.orm import *
+from taskobra.web import db
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 
@@ -14,19 +15,19 @@ def base():
 @blueprint.route('/systems')
 def systems():
     system_list = [
-        {'hostname': system.name, 
+        {'hostname': system.name,
         'cores' : sum([component.core_count for _, component in system.components if isinstance(component, CPU)]),
         'memory': '16GB', 'storage': '500GB' }
         for system in System.query.all()
     ]
     return jsonify(system_list)
-    
+
 @blueprint.route('/metrics/cpu')
 def metrics_cpu():
     # [ [x, y], [x2, y2] ... ]
     #CPUPercent.join(Systems).query(system.system_name == "")
     percent_list = []
-    snapshots = Snapshot.query.all() 
+    snapshots = Snapshot.query.all()
     for snapshot in snapshots:
         cpu_percent = []
         for metric in snapshot.metrics:
@@ -63,5 +64,10 @@ def metrics_storage():
 
 @blueprint.route('/prune')
 def prune():
-    db.session.query(System)
+    for old, new in Snapshot.prune(db.session.query(Snapshot)):
+        if old:
+            db.session.delete(old)
+        if new:
+            db.session.add(new)
+        db.session.commit()
     return jsonify({})
