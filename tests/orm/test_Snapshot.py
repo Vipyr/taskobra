@@ -8,6 +8,7 @@ import logging
 from math import log
 import random
 from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy.orm.session import make_transient
 import sys
 from typing import Collection
 from unittest import skip
@@ -137,12 +138,19 @@ class TestSnapshot(ORMTestCase):
         print(f"(test_prune_random seed=0x{seed:0>16X}) ", end="")
         sys.stdout.flush()
         random.seed(seed)
+
         snapshot_count = 2000
         pruned = Snapshot.prune(snapshot_generator(snapshot_count))
         self.assertEqual(snapshot_count, sum(snapshot.sample_count for _, snapshot in pruned if snapshot))
 
     def test_prune_db(self):
-        snapshot_count = 50
+        seed = random.randint(0, 0xFFFFFFFFFFFFFFFF)
+        seed = 0x5CB16AE444FB6681
+        print(f"(test_prune_db seed=0x{seed:0>16X}) ", end="")
+        sys.stdout.flush()
+        random.seed(seed)
+
+        snapshot_count = 5
         snapshots = [snapshot for snapshot in snapshot_generator(snapshot_count)]
         original = []
         pruned = []
@@ -150,13 +158,13 @@ class TestSnapshot(ORMTestCase):
             if old: original.append(old)
             if new: pruned.append(new)
         with TestDatabase("sqlite:///:memory:", snapshots) as session:
-            for old, new in Snapshot.prune(session.query(Snapshot)):
-                if old:
-                    session.delete(old)
-                if new:
-                    session.add(new)
-                session.commit()
-            queried = list(session.query(Snapshot))
+            queried = list(session.query(Snapshot).order_by(Snapshot.timestamp.desc()))
+            self.assertEqual(snapshots, queried)
+            for old, new in Snapshot.prune(session.query(Snapshot).order_by(Snapshot.timestamp.desc())):
+                if old: session.delete(old)
+                if new: session.add(new)
+            session.commit()
+            queried = list(session.query(Snapshot).order_by(Snapshot.timestamp.desc()))
             self.assertEqual(snapshots, original)
             self.assertEqual(queried, pruned)
             self.assertEqual(snapshot_count, sum(snapshot.sample_count for snapshot in queried if snapshot))

@@ -64,11 +64,8 @@ def metrics_storage():
 
 @blueprint.route('/prune')
 def prune():
-    for old, new in Snapshot.prune(db_session.query(Snapshot)):
-        if old:
-            db_session.delete(old)
-        if new:
-            db_session.add(new)
-        if old or new:
-            db_session.commit()
+    for old, new in Snapshot.prune(db_session.query(Snapshot).order_by(Snapshot.timestamp.desc())):
+        if old: db_session.delete(old)
+        if new: db_session.add(new)
+    db_session.commit()
     return jsonify({})

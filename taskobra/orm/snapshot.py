@@ -20,7 +20,7 @@ class Snapshot(ORMBase):
     __tablename__ = "Snapshot"
     unique_id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
-    metrics = relationship("Metric", secondary=snapshot_metric_table)
+    metrics = relationship("Metric", secondary=snapshot_metric_table, lazy="joined")
     sample_count = Column(Integer, default=1)
     sample_rate = Column(Float, default=1.0)
     sample_base = Column(Float, default=2.0)
@@ -46,7 +46,6 @@ class Snapshot(ORMBase):
         return (
             self.timestamp and
             other.timestamp and
-            # self.sample_exponent > other.sample_exponent and
             (
                 self.t_start  < other.timestamp <= self.t_end or
                 other.t_start < self.timestamp  <= other.t_end
