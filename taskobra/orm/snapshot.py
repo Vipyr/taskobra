@@ -20,7 +20,7 @@ class Snapshot(ORMBase):
     __tablename__ = "Snapshot"
     unique_id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
-    metrics = relationship("Metric", secondary=snapshot_metric_table)
+    metrics = relationship("Metric", secondary=snapshot_metric_table, lazy="joined")
     sample_count = Column(Integer, default=1)
     sample_rate = Column(Float, default=1.0)
     sample_base = Column(Float, default=2.0)
@@ -98,6 +98,7 @@ class Snapshot(ORMBase):
         pruned = Snapshot(sample_count=0, sample_exponent=1)
 
         for snapshot in snapshots:
+            # [metric for metric in snapshot.metrics]
             try:
                 pruned = pruned.merge(snapshot)
                 yield snapshot, None
