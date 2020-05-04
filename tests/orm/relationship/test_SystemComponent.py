@@ -3,7 +3,7 @@ from taskobra.orm import get_engine, get_session, Component, System, SystemCompo
 
 
 class TestSystemComponent(ORMTestCase):
-    def test_SystemComponent_user_property(self):
+    def test_SystemComponent_component_property(self):
         system = System(name="Fred's Computer")
         component = Component()
         system_component = SystemComponent(system=system)
