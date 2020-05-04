@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import json
 import random
 import statistics
@@ -26,18 +26,15 @@ def systems():
 def metrics_cpu():
     # [ [x, y], [x2, y2] ... ]
     #CPUPercent.join(Systems).query(system.system_name == "")
-    percent_list = []
-    snapshots = Snapshot.query.all()
-    for snapshot in snapshots:
-        cpu_percent = []
-        for metric in snapshot.metrics:
-            if isinstance(metric, CpuPercent):
-                cpu_percent.append(metric.mean)
-        #total_cpu = statistics.mean(
-        #    metric.mean for metric in snapshot.metrics if isinstance(metric, CpuPercent)
-        #)
-        total_cpu = statistics.mean(cpu_percent)
-        percent_list.append([snapshot.timestamp, total_cpu])
+    hostnames = request.args.get('hostnames').split(',')
+    for hostname in hostnames:
+        percent_list = []
+        snapshots = Snapshot.query.all()
+        for snapshot in snapshots:
+            total_cpu = statistics.mean(
+                metric.mean for metric in snapshot.metrics if isinstance(metric, CpuPercent)
+            )
+            percent_list.append([snapshot.timestamp, total_cpu])
 
     return jsonify(percent_list)
 
