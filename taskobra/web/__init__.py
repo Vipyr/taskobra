@@ -20,10 +20,8 @@ def create_app():
             static_folder='static')         # Root Path for url_for('static')
 
     # Load config from ENV
-    app.config['DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
-    # TODO: OAuth Key
-    # TODO: ???
-    print(f" * Using Database URI {app.config['DATABASE_URI']}")
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///taskobra.sqlite.db')
+
     # Bind Route Blueprints Packages to the base App
     app.register_blueprint(api.blueprint)
     app.register_blueprint(ui.blueprint)
