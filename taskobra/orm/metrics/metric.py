@@ -16,6 +16,7 @@ class Metric(ORMBase):
     variance = Column(Float, default=0.0)
     metric_type = Column(Enum(
         "CpuPercent",
+        "VirtualMemoryUsage",
         "TestMetricMetric",
         "TestSnapshotMetric",
         name="MetricType"
