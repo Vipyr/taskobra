@@ -40,7 +40,7 @@ function render_charts() {
     var metric_type = chart.getAttribute('data-metric-type')
     var selected_host_ids  = $("tr input:checked").map(function () { return this.value }).get()
     // TODO: Change value -> getClass 
-    var selected_hostnames = $("tr input:checked").map(function () { return this.value }).get()
+    var selected_hostnames = $("tr input:checked").map(function () { return this.querySelector(".hostlist-name").textContent }).get()
 
     // Ensure the chart is visible and a set of data sets are selected before rendering
     if ($( chart ).parent('.active').length == 0) { return }

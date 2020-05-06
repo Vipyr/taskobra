@@ -51,9 +51,8 @@ def metrics_gpu():
 
 @blueprint.route('/metrics/memory')
 def metrics_memory():
-    percent_list = [
-        [idx, random.uniform(0, 100)] for idx in range(0, 1000)
-    ]
+    host_ids = request.args.get('host_ids').split(',')
+    percent_list = serialize_metrics(host_ids, VirtualMemoryUsage)
     return jsonify(percent_list)
 
 @blueprint.route('/metrics/storage')
