@@ -20,6 +20,7 @@ class Snapshot(ORMBase):
     __tablename__ = "Snapshot"
     unique_id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
+    system = relationship("System", secondary=system_snapshot_table)
     metrics = relationship("Metric", secondary=snapshot_metric_table, lazy="joined")
     sample_count = Column(Integer, default=1)
     sample_rate = Column(Float, default=1.0)

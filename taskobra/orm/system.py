@@ -4,7 +4,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 # Taskobra
 from taskobra.orm.base import ORMBase
-from taskobra.orm.relationships import SystemComponent
+from taskobra.orm.relationships import SystemComponent, system_snapshot_table
 
 
 class System(ORMBase):
@@ -13,6 +13,7 @@ class System(ORMBase):
     name = Column(String)
     user_roles = relationship("UserSystemRole")
     system_components = relationship("SystemComponent")
+    snapshots = relationship("Snapshot", secondary=system_snapshot_table)
 
     @property
     def components(self):
