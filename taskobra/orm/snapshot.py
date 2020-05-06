@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from functools import reduce
 from itertools import chain
 from math import ceil, log
-from sqlalchemy import DateTime, Column, Float, Integer
+from sqlalchemy import DateTime, Column, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from typing import Generator
 from typing import Iterable
@@ -13,6 +13,7 @@ from taskobra.orm.base import ORMBase
 from taskobra.orm.relationships.snapshot_metric import snapshot_metric_table
 from taskobra.orm.relationships.system_snapshot import system_snapshot_table
 
+
 class Snapshot(ORMBase):
 
     class UnmergableException(Exception): pass
@@ -20,7 +21,8 @@ class Snapshot(ORMBase):
     __tablename__ = "Snapshot"
     unique_id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
-    system = relationship("System", secondary=system_snapshot_table)
+    system_id = Column(Integer, ForeignKey("System.unique_id"))
+    system = relationship("System", back_populates="snapshots")
     metrics = relationship("Metric", secondary=snapshot_metric_table, lazy="joined")
     sample_count = Column(Integer, default=1)
     sample_rate = Column(Float, default=1.0)
