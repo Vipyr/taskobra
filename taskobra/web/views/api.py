@@ -38,7 +38,7 @@ def systems():
 
 @blueprint.route('/metrics/cpu')
 def metrics_cpu():
-    host_ids = request.args.get('host_ids').split(',')
+    host_ids = request.args.get('host_ids', '').split(',')
     percent_list = serialize_metrics(host_ids, CpuPercent)
     return jsonify(percent_list)
 
@@ -51,7 +51,7 @@ def metrics_gpu():
 
 @blueprint.route('/metrics/memory')
 def metrics_memory():
-    host_ids = request.args.get('host_ids').split(',')
+    host_ids = request.args.get('host_ids', '').split(',')
     percent_list = serialize_metrics(host_ids, VirtualMemoryUsage)
     return jsonify(percent_list)
 
