@@ -1,3 +1,5 @@
+from unittest import skip
+
 from .WebTestCase import WebTestCase
 import flask
 

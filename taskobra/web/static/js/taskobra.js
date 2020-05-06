@@ -10,7 +10,8 @@ function render_systems(system_list) {
   system_list.forEach(host => {
     // Fill in the attrs of the instance
     var instance = template.content.cloneNode(true);
-    instance.querySelector(".hostlist-checkbox").value = host.hostname;
+    instance.querySelector(".hostlist-checkbox").value = host.unique_id;
+    instance.querySelector(".hostlist-checkbox").setAttribute('data-hostname', host.hostname);
     instance.querySelector(".hostlist-name").textContent = host.hostname;
     instance.querySelector(".hostlist-cores").textContent = host.cores;
     instance.querySelector(".hostlist-memory").textContent = host.memory;
@@ -18,11 +19,15 @@ function render_systems(system_list) {
     instance.querySelector("tr").addEventListener("click", function(event){
       var hostlist_checkbox = event.currentTarget.querySelector(".hostlist-checkbox");
       hostlist_checkbox.checked = !hostlist_checkbox.checked;
+      render_charts()
     }, false);
 
     // Add it to the content section 
     document.querySelector("#taskobra-hostlist-entries").appendChild(instance);
   });
+  
+  // Always ensure at least one hostname is checked 
+  $('input:checkbox:first').each(function () { this.checked = true })
 }
 
 /*
@@ -32,24 +37,46 @@ function render_systems(system_list) {
 */
 function render_charts() {
   document.querySelectorAll(".taskobra-chart").forEach(chart => {
-    if ($( chart ).parent('.active').length == 0) { return }
+    // Query the UI for information about what the user wants rendered
     var metric_type = chart.getAttribute('data-metric-type')
-    $.ajax({url: "/api/metrics/" + metric_type, chart: chart, success: function(chart_data) {
-      var labels = [ [ {label: 'Time', id: 'time'}, {label: 'Utilization', id: 'utilization', type: 'number'} ] ];
-      var data = google.visualization.arrayToDataTable(
-        labels.concat(chart_data)
-      );
+    var selected_host_ids  = $("tr input:checked").map(function () { return this.value }).get()
+    var selected_hostnames = $("tr input:checked").map(function () { return this.getAttribute('data-hostname') }).get()
 
-      var options = {
-        curveType: 'function',
-        width: $(window).width()*0.80, 
-        height: $(window).height()*0.50, 
-        chartArea: {'width': '90%', 'height': '80%'},
-        legend: {position: 'none'}
-      };
+    // Ensure the chart is visible and a set of data sets are selected before rendering
+    if ($( chart ).parent('.active').length == 0) { return }
+    if (selected_hostnames.length == 0) { return }
 
-      var chart = new google.visualization.LineChart(this.chart);
-      chart.draw(data, options);
+    // Asynchronously fetch data and draw the chart 
+    $.ajax({
+      url: "/api/metrics/" + metric_type, 
+      data: {'host_ids': selected_host_ids.join(',')},
+      chart: chart, hostnames: selected_hostnames, 
+      success: function(chart_data) {
+        // Generate the labels for the legend based on the selected hosts 
+        var labels = [ {label: 'Time', id: 'time'} ]; 
+        this.hostnames.forEach(function (hostname) { 
+          var hostname_id = hostname.toLowerCase().split(' ').join('')
+          labels.push({label: hostname, id: hostname_id, type: 'number'}) 
+        })
+
+        // Google requires a 'DataTable' object for it series
+        // This is of the shape [ [{ column info }] [x1, y1, z1] [x2, y2, z2] ]
+        var data = google.visualization.arrayToDataTable(
+          [ labels ].concat(chart_data)
+        );
+
+        // Use window information to make the chart responsive to page sizing
+        var options = {
+          curveType: 'function',
+          width: $(window).width()*0.80, 
+          height: $(window).height()*0.50, 
+          chartArea: {'width': '90%', 'height': '80%'},
+          legend: {position: 'none'}, 
+          interpolateNulls: true
+        };
+
+        var chart = new google.visualization.LineChart(this.chart);
+        chart.draw(data, options);
     }})
   });
 }
@@ -68,7 +95,6 @@ window.onload = (event) => {
   // Load the Visualization API and the corechart package.
   google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(render_charts);
-  setInterval(render_charts, 1000);
 };
 
 /* 
@@ -77,4 +103,5 @@ window.onload = (event) => {
 */
 $( document ).ready(function () {
   $('#v-pills-cpu-tab').tab('show')
+  setInterval(render_charts, 1000);
 })
