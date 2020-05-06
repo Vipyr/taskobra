@@ -1,6 +1,6 @@
 from .base import get_engine, get_session, ORMBase
 from .components import Component, CPU, GPU, Memory, OperatingSystem, Storage
-from .metrics import Metric, CpuPercent
+from .metrics import Metric, CpuPercent, VirtualMemoryUsage
 from .role import Role
 from .user import User
 from .snapshot import Snapshot
