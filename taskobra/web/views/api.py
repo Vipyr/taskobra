@@ -8,6 +8,22 @@ from taskobra.web.database import db_session
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 
+def serialize_metrics(host_ids, metric_type):
+    percent_list = []
+    systems = System.query.filter(System.unique_id.in_(host_ids)).all()
+    print(systems)
+    for idx, system in enumerate(systems):
+        for snapshot in system.snapshots:
+            print(snapshot)
+            total_cpu = statistics.mean(
+                metric.mean for metric in snapshot.metrics if isinstance(metric, metric_type)
+            )
+            snapshot_row = [timestamp] + [None] * len(hostnames)
+            snapshot_row[idx+1] = total_cpu
+            percent_list.append(snapshot_row)
+    print(percent_list)
+    return percent_list
+
 @blueprint.route('/')
 def base():
     return jsonify({})
@@ -15,7 +31,8 @@ def base():
 @blueprint.route('/systems')
 def systems():
     system_list = [
-        {'hostname': system.name,
+        {'unique_id' : system.unique_id, 
+        'hostname': system.name,
         'cores' : sum([component.core_count for _, component in system.components if isinstance(component, CPU)]),
         'memory': '16GB', 'storage': '500GB' }
         for system in System.query.all()
@@ -24,18 +41,8 @@ def systems():
 
 @blueprint.route('/metrics/cpu')
 def metrics_cpu():
-    # [ [x, y], [x2, y2] ... ]
-    #CPUPercent.join(Systems).query(system.system_name == "")
-    hostnames = request.args.get('hostnames').split(',')
-    for hostname in hostnames:
-        percent_list = []
-        snapshots = Snapshot.query.all()
-        for snapshot in snapshots:
-            total_cpu = statistics.mean(
-                metric.mean for metric in snapshot.metrics if isinstance(metric, CpuPercent)
-            )
-            percent_list.append([snapshot.timestamp, total_cpu])
-
+    host_ids = request.args.get('host_ids').split(',')
+    percent_list = serialize_metrics(host_ids, CpuPercent)
     return jsonify(percent_list)
 
 @blueprint.route('/metrics/gpu')

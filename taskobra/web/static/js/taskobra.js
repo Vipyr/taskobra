@@ -10,7 +10,7 @@ function render_systems(system_list) {
   system_list.forEach(host => {
     // Fill in the attrs of the instance
     var instance = template.content.cloneNode(true);
-    instance.querySelector(".hostlist-checkbox").value = host.hostname;
+    instance.querySelector(".hostlist-checkbox").value = host.unique_id;
     instance.querySelector(".hostlist-name").textContent = host.hostname;
     instance.querySelector(".hostlist-cores").textContent = host.cores;
     instance.querySelector(".hostlist-memory").textContent = host.memory;
@@ -37,6 +37,8 @@ function render_charts() {
   document.querySelectorAll(".taskobra-chart").forEach(chart => {
     // Query the UI for information about what the user wants rendered
     var metric_type = chart.getAttribute('data-metric-type')
+    var selected_host_ids  = $("tr input:checked").map(function () { return this.value }).get()
+    // TODO: Change value -> getClass 
     var selected_hostnames = $("tr input:checked").map(function () { return this.value }).get()
 
     // Ensure the chart is visible and a set of data sets are selected before rendering
@@ -46,7 +48,7 @@ function render_charts() {
     // Asynchronously fetch data and draw the chart 
     $.ajax({
       url: "/api/metrics/" + metric_type, 
-      data: {'hostnames': selected_hostnames.join(',')},
+      data: {'host_ids': selected_host_ids.join(',')},
       chart: chart, hostnames: selected_hostnames, 
       success: function(chart_data) {
         // Generate the labels for the legend based on the selected hosts 

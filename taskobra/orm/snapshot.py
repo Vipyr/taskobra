@@ -11,7 +11,7 @@ from typing import Iterable
 # Taskobra
 from taskobra.orm.base import ORMBase
 from taskobra.orm.relationships.snapshot_metric import snapshot_metric_table
-
+from taskobra.orm.relationships.system_snapshot import system_snapshot_table
 
 class Snapshot(ORMBase):
 
