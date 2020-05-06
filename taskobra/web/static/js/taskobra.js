@@ -57,12 +57,15 @@ function render_charts() {
           var hostname_id = hostname.toLowerCase().split(' ').join('')
           labels.push({label: hostname, id: hostname_id, type: 'number'}) 
         })
+        console.log("AHHH THIS IS THE CHARTS AJAX")
+        console.log(labels)
 
         // Google requires a 'DataTable' object for it series
         // This is of the shape [ [{ column info }] [x1, y1, z1] [x2, y2, z2] ]
         var data = google.visualization.arrayToDataTable(
           [ labels ].concat(chart_data)
         );
+        console.log([ labels ].concat(chart_data))
 
         // Use window information to make the chart responsive to page sizing
         var options = {
@@ -70,7 +73,8 @@ function render_charts() {
           width: $(window).width()*0.80, 
           height: $(window).height()*0.50, 
           chartArea: {'width': '90%', 'height': '80%'},
-          legend: {position: 'none'}
+          legend: {position: 'none'}, 
+          interpolateNulls: true
         };
 
         var chart = new google.visualization.LineChart(this.chart);
@@ -101,5 +105,5 @@ window.onload = (event) => {
 */
 $( document ).ready(function () {
   $('#v-pills-cpu-tab').tab('show')
-  setInterval(render_charts, 1000);
+  setInterval(render_charts, 10000);
 })

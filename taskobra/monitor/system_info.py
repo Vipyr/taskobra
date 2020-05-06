@@ -29,7 +29,8 @@ def create_system(args, database_engine):
         if current_system is None:
             session.add(system)
             session.commit()
-        
+
+    return system 
     #gpu = GPU(
     #    manufacturer="NVIDIA",
     #    model="1070",

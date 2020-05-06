@@ -13,7 +13,7 @@ class System(ORMBase):
     name = Column(String)
     user_roles = relationship("UserSystemRole")
     system_components = relationship("SystemComponent")
-    snapshots = relationship("Snapshot", back_populates="system", order_by="desc(Snapshot.timestamp)")
+    snapshots = relationship("Snapshot", back_populates="system", order_by="desc(Snapshot.timestamp)", lazy="joined")
 
     @property
     def components(self):

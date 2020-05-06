@@ -18,7 +18,7 @@ def serialize_metrics(host_ids, metric_type):
             total_cpu = statistics.mean(
                 metric.mean for metric in snapshot.metrics if isinstance(metric, metric_type)
             )
-            snapshot_row = [timestamp] + [None] * len(hostnames)
+            snapshot_row = [snapshot.timestamp] + [None] * len(systems)
             snapshot_row[idx+1] = total_cpu
             percent_list.append(snapshot_row)
     print(percent_list)

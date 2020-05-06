@@ -53,11 +53,12 @@ def create_database_engine(args):
 
 def main(args):
     database_engine = create_database_engine(args)
-    system_info.create_system(args, database_engine)
+    current_system = system_info.create_system(args, database_engine)
     while True:
         time.sleep(args.sample_rate)
         snapshot = create_snapshot(args)
         snapshot.sample_rate = args.sample_rate
+        snapshot.system = current_system
         with get_session(bind=database_engine) as session:
             print(snapshot)
             session.add(snapshot)
