@@ -11,18 +11,15 @@ blueprint = Blueprint('api', __name__, url_prefix='/api')
 def serialize_metrics(host_ids, metric_type):
     percent_list = []
     systems = System.query.filter(System.unique_id.in_(host_ids)).all()
-    print(systems)
     for idx, system in enumerate(systems):
         for snapshot in system.snapshots:
-            print(snapshot)
             total_cpu = statistics.mean(
                 metric.mean for metric in snapshot.metrics if isinstance(metric, metric_type)
             )
             snapshot_row = [snapshot.timestamp] + [None] * len(systems)
             snapshot_row[idx+1] = total_cpu
             percent_list.append(snapshot_row)
-    print(percent_list)
-    return percent_list
+    return sorted(percent_list, key=lambda row: row[0])
 
 @blueprint.route('/')
 def base():
