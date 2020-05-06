@@ -6,4 +6,4 @@ from .user import User
 from .snapshot import Snapshot
 from .snapshot_control import SnapshotControl
 from .system import System
-from .relationships import SystemComponent, user_role_table, UserSystemRole
+from .relationships import SystemComponent, user_role_table, UserSystemRole, system_snapshot_table
