@@ -11,6 +11,7 @@ function render_systems(system_list) {
     // Fill in the attrs of the instance
     var instance = template.content.cloneNode(true);
     instance.querySelector(".hostlist-checkbox").value = host.unique_id;
+    instance.querySelector(".hostlist-checkbox").setAttribute('data-hostname', host.hostname);
     instance.querySelector(".hostlist-name").textContent = host.hostname;
     instance.querySelector(".hostlist-cores").textContent = host.cores;
     instance.querySelector(".hostlist-memory").textContent = host.memory;
@@ -39,8 +40,7 @@ function render_charts() {
     // Query the UI for information about what the user wants rendered
     var metric_type = chart.getAttribute('data-metric-type')
     var selected_host_ids  = $("tr input:checked").map(function () { return this.value }).get()
-    // TODO: Change value -> getClass 
-    var selected_hostnames = $("tr input:checked").map(function () { return this.querySelector(".hostlist-name").textContent }).get()
+    var selected_hostnames = $("tr input:checked").map(function () { return this.getAttribute('data-hostname') }).get()
 
     // Ensure the chart is visible and a set of data sets are selected before rendering
     if ($( chart ).parent('.active').length == 0) { return }
